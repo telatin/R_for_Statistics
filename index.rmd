@@ -1,0 +1,13 @@
+---
+title: "R and RStudio for Statistics"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# R Markdown
+
+This site hosts my various course notes, presentations and data files accompanying my courses on R and RStudio.
+
