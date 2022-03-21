@@ -1,0 +1,275 @@
+
+
+---
+title: 'Analysis Walkthrough'
+author: "George Savva"
+date: "March 2022"
+---
+
+
+# Motivation
+
+We have an Excel spreadsheet with data corresponding to a walking speed intervention.  Hosptial patients were recruited from five hospital departments and 
+
+Here we report an analysis of this dataset.
+
+We will answer the following questions:
+
+* What is the mean and standard deviation of walking speed in each treatment group
+* Does the treatment improve walking speed
+* Is the treatment effect different between men and women
+
+Our workflow is:
+
+* Load data
+* Wrangle
+* Describe
+* Visualise
+* Clean and recode
+* Test and model
+* Report
+
+# Load libraries
+
+```{r }
+
+library(ggplot2)
+library(dplyr)
+library(data.table)
+library(readxl)
+
+```
+
+# Load data
+
+We should inspect the data in Excel.  Note there are three sheets that we need to combine.  We need to lead 
+
+```{r }
+treated <- read_excel(path="walkingspeed.xlsx", 
+                      sheet = "treated",
+                      range = "A1:B68")
+```
+
+Notes:
+* The library readxl for reading Excel sheets.  There are alternatives but I find this works well.
+* Multiline function call
+* Named arguments
+* Assigning the outcome to the variable
+* Help file, how did we know how this function worked.
+
+We need to load all three sheets as separate data frames.
+
+```{r }
+control <- read_excel(path="walkingspeed.xlsx", 
+                      sheet = "control",
+                      range = "A1:B70")
+
+metadata <- read_excel(path="walkingspeed.xlsx", 
+                      sheet = "meta",
+                      range = "A1:D139")
+```
+
+# Explore data
+
+R includes several functions to inspect data
+
+```{r }
+class(treated)
+str(treated)
+summary(treated)
+head(treated)
+# View(treated)
+str(control)
+```
+
+Notes:
+* Data can be numeric, character strings, (factors or logical)
+
+# Access elements from the dataframe
+
+```{r }
+control$walktime
+control$walktime[1]
+control$walktime[1:10]
+mean(control$walktime)
+mean(control$walktime[1:5])
+
+log(control$walktime)
+log(control$walktime[1:5])
+
+```
+
+# Wrangle
+
+For analysis we will need all the data into one data frame.  We need to append (row bind) the treatment and control results, then merge (join)  the meta data.
+
+
+```{r }
+# Remind ourselves of the structure of the dataset
+str(treated)
+str(control)
+```
+
+We need to make sure the vectors we are merging have the same type and name
+
+There are a lot of ways to do the same thing!
+
+```{r }
+# Base R
+treated$walktime <- as.numeric(treated$time)
+
+# data.table
+setDT(treated)
+treated[ , walktime := as.numeric(time)  ]
+
+# tidyverse
+treated <- treated %>% mutate(walktime = as.numeric(time))
+```
+
+Now we can append the rows:
+
+```{r }
+# data.table
+combined <- rbind(treated, control, fill=TRUE)
+# tidyverse
+combined <- bind_rows(treated, control)
+combined <- bind_rows(treated = treated, 
+                      control = control, 
+                      .id = "group")
+
+str(metadata)
+str(combined)
+
+walkingdata <- merge(combined, metadata, 
+                by.x = "patid", by.y = "patient")
+
+head(walkingdata)
+str(walkingdata)
+summary(walkingdata)
+```
+
+
+
+# Describe
+
+```{r }
+# Tidyverse
+walkingdata %>% 
+  filter(!is.na(walktime)) %>% 
+  group_by(group) %>% 
+  summarise(Mean=mean(walktime), SD=sd(walktime))
+
+# data.table
+walkingdata[!is.na(walktime) ,  
+            .(Mean=mean(walktime), SD=sd(walktime)),
+            group]
+```
+
+
+# Visualise
+
+```{r  }
+# A very bad graph
+plot(walkingdata$age , walkingdata$walktime)
+
+# A better graph
+ggplot(walkingdata) + 
+  aes(x=age, y=walktime) + 
+  geom_point()
+
+# Adorn the graph
+ggplot(walkingdata) + 
+  aes(x=age, y=walktime) + 
+  geom_point() + 
+  labs(x="Age (years)", y="Time (seconds)") + 
+  scale_y_log10() + 
+  facet_wrap(~sex) +
+  theme_bw()
+
+ggplot(walkingdata) + 
+  aes(x=group, y=walktime) + 
+  geom_boxplot() + 
+  labs(x="Treatment group", y="Time (seconds)") + 
+  scale_y_log10() + 
+  facet_wrap(~sex) +
+  theme_bw()
+```
+  
+
+# Clean data
+
+```{r }
+# base
+walkingdata$walktime[ walkingdata$walktime > 100 ] <- NA
+walkingdata$walktime[ walkingdata$walktime < 0.1 ] <- NA
+# data.table
+walkingdata[ walktime>100 , walktime := NA]
+walkingdata[ walktime<0.1 , walktime := NA]
+```
+
+# Simple tests
+
+```{r }
+t.test( data = walkingdata , walktime ~ group)
+ttest1 <- t.test( data = walkingdata , walktime ~ group)
+ttest1$p.value
+```
+
+# Model
+```{r }
+lm1 <- lm( data = walkingdata , walktime ~ group)
+summary(lm1)
+confint(lm1)
+```
+# Diagnose
+
+```{r }
+plot(lm1)
+
+
+walkingdata[ , speed := 1/walktime]
+
+lm2 <- lm( data = walkingdata , log(walktime) ~ group)
+lm3 <- lm( data = walkingdata , 1/walktime ~ group)
+plot(lm2)
+plot(lm3)
+
+summary(lm3)
+gtsummary::tbl_regression(lm3)
+```
+
+# Augment model
+
+```{r }
+lm4 <- lm( data = walkingdata , 1/walktime ~ group + age + sex + department)
+gtsummary::tbl_regression(lm4)
+
+lm5 <- lm( data = walkingdata , 1/walktime ~ group + age + sex + factor(department))
+gtsummary::tbl_regression(lm5)
+
+anova(lm5 , update(lm5, . ~ . -age))
+```
+
+# Interactions
+
+```{r }
+lm6 <- lm( data = walkingdata , 1/walktime ~ group*sex + age +  factor(department))
+
+gtsummary::tbl_regression(lm6)
+
+anova( lm5 , lm6 )
+library(emmeans)
+emmeans(lm6, pairwise ~ group | sex)
+
+treatmentestimates <- as.data.frame(confint(emmeans(lm6, pairwise ~ group | sex)$contrast))
+```{r }
+g1 <- ggplot(treatmentestimates) + aes(x=sex, y=estimate, ymin=lower.CL, ymax=upper.CL) + 
+  geom_point() + 
+  geom_errorbar(width=0.2) + 
+  geom_hline(yintercept = 0) + 
+  theme_bw() + 
+  labs(x="Sex", y="Treatment effect") 
+  
+g1 
+g1 + coord_flip()
+```  
