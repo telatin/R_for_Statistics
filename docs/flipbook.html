@@ -1,0 +1,1416 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Basic ggplot for scientific graphing</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="George Savva" />
+    <script src="site_libs/header-attrs-2.10/header-attrs.js"></script>
+    <link href="site_libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="site_libs/remark-css-0.0.1/hygge.css" rel="stylesheet" />
+    <link href="site_libs/remark-css-0.0.1/ninjutsu.css" rel="stylesheet" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Basic ggplot for scientific graphing
+## Made with flipbookr and xaringan
+### George Savva
+
+---
+
+
+
+
+
+
+# Welcome
+
+
+
+This 'flipbook' template demonstrates the key features of ggplot2 in building nice scientific graphs
+
+--
+
+The presentation is made completely in R with the `xaringan` package for presentations and `flipbookr` package for the construction of the plot slides.
+
+--
+
+The Rmarkdown code is available for you to read!
+
+
+--- 
+---
+
+
+count: false
+ 
+
+.panel1-walking-auto[
+
+```r
+*library(readxl)
+```
+]
+ 
+.panel2-walking-auto[
+
+]
+
+---
+count: false
+ 
+
+.panel1-walking-auto[
+
+```r
+library(readxl)
+*walkingdata &lt;- read_excel(path="walkingspeed.xlsx",
+*                         sheet="fixed")
+```
+]
+ 
+.panel2-walking-auto[
+
+]
+
+---
+count: false
+ 
+
+.panel1-walking-auto[
+
+```r
+library(readxl)
+walkingdata &lt;- read_excel(path="walkingspeed.xlsx",
+                          sheet="fixed")
+*walkingdata$department &lt;- factor(walkingdata$department)
+```
+]
+ 
+.panel2-walking-auto[
+
+]
+
+---
+count: false
+ 
+
+.panel1-walking-auto[
+
+```r
+library(readxl)
+walkingdata &lt;- read_excel(path="walkingspeed.xlsx",
+                          sheet="fixed")
+walkingdata$department &lt;- factor(walkingdata$department)
+*walkingdata$time &lt;- as.numeric(walkingdata$time)
+```
+]
+ 
+.panel2-walking-auto[
+
+]
+
+---
+count: false
+ 
+
+.panel1-walking-auto[
+
+```r
+library(readxl)
+walkingdata &lt;- read_excel(path="walkingspeed.xlsx",
+                          sheet="fixed")
+walkingdata$department &lt;- factor(walkingdata$department)
+walkingdata$time &lt;- as.numeric(walkingdata$time)
+*walkingdata$time[walkingdata$time&gt;100] &lt;- NA
+```
+]
+ 
+.panel2-walking-auto[
+
+]
+
+---
+count: false
+ 
+
+.panel1-walking-auto[
+
+```r
+library(readxl)
+walkingdata &lt;- read_excel(path="walkingspeed.xlsx",
+                          sheet="fixed")
+walkingdata$department &lt;- factor(walkingdata$department)
+walkingdata$time &lt;- as.numeric(walkingdata$time)
+walkingdata$time[walkingdata$time&gt;100] &lt;- NA
+*walkingdata$time[walkingdata$time&lt;1] &lt;- NA
+```
+]
+ 
+.panel2-walking-auto[
+
+]
+
+---
+count: false
+ 
+
+.panel1-walking-auto[
+
+```r
+library(readxl)
+walkingdata &lt;- read_excel(path="walkingspeed.xlsx",
+                          sheet="fixed")
+walkingdata$department &lt;- factor(walkingdata$department)
+walkingdata$time &lt;- as.numeric(walkingdata$time)
+walkingdata$time[walkingdata$time&gt;100] &lt;- NA
+walkingdata$time[walkingdata$time&lt;1] &lt;- NA
+
+
+*head(walkingdata)
+```
+]
+ 
+.panel2-walking-auto[
+
+```
+# A tibble: 6 x 6
+  patid group    time sex     age department
+  &lt;dbl&gt; &lt;chr&gt;   &lt;dbl&gt; &lt;chr&gt; &lt;dbl&gt; &lt;fct&gt;     
+1     1 treat    1.90 M        53 3         
+2     2 control  3.54 M        61 3         
+3     3 treat    2.93 M        65 1         
+4     4 control  1.82 M        48 2         
+5     5 treat    2.20 M        62 2         
+6     6 control  3.04 M        62 4         
+```
+]
+
+---
+count: false
+ 
+
+.panel1-walking-auto[
+
+```r
+library(readxl)
+walkingdata &lt;- read_excel(path="walkingspeed.xlsx",
+                          sheet="fixed")
+walkingdata$department &lt;- factor(walkingdata$department)
+walkingdata$time &lt;- as.numeric(walkingdata$time)
+walkingdata$time[walkingdata$time&gt;100] &lt;- NA
+walkingdata$time[walkingdata$time&lt;1] &lt;- NA
+
+
+head(walkingdata)
+
+*library(ggplot2)
+```
+]
+ 
+.panel2-walking-auto[
+
+```
+# A tibble: 6 x 6
+  patid group    time sex     age department
+  &lt;dbl&gt; &lt;chr&gt;   &lt;dbl&gt; &lt;chr&gt; &lt;dbl&gt; &lt;fct&gt;     
+1     1 treat    1.90 M        53 3         
+2     2 control  3.54 M        61 3         
+3     3 treat    2.93 M        65 1         
+4     4 control  1.82 M        48 2         
+5     5 treat    2.20 M        62 2         
+6     6 control  3.04 M        62 4         
+```
+]
+
+---
+count: false
+ 
+
+.panel1-walking-auto[
+
+```r
+library(readxl)
+walkingdata &lt;- read_excel(path="walkingspeed.xlsx",
+                          sheet="fixed")
+walkingdata$department &lt;- factor(walkingdata$department)
+walkingdata$time &lt;- as.numeric(walkingdata$time)
+walkingdata$time[walkingdata$time&gt;100] &lt;- NA
+walkingdata$time[walkingdata$time&lt;1] &lt;- NA
+
+
+head(walkingdata)
+
+library(ggplot2)
+
+*ggplot(walkingdata)
+```
+]
+ 
+.panel2-walking-auto[
+
+```
+# A tibble: 6 x 6
+  patid group    time sex     age department
+  &lt;dbl&gt; &lt;chr&gt;   &lt;dbl&gt; &lt;chr&gt; &lt;dbl&gt; &lt;fct&gt;     
+1     1 treat    1.90 M        53 3         
+2     2 control  3.54 M        61 3         
+3     3 treat    2.93 M        65 1         
+4     4 control  1.82 M        48 2         
+5     5 treat    2.20 M        62 2         
+6     6 control  3.04 M        62 4         
+```
+
+&lt;img src="flipbook_files/figure-html/walking_auto_09_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+
+.panel1-walking-auto[
+
+```r
+library(readxl)
+walkingdata &lt;- read_excel(path="walkingspeed.xlsx",
+                          sheet="fixed")
+walkingdata$department &lt;- factor(walkingdata$department)
+walkingdata$time &lt;- as.numeric(walkingdata$time)
+walkingdata$time[walkingdata$time&gt;100] &lt;- NA
+walkingdata$time[walkingdata$time&lt;1] &lt;- NA
+
+
+head(walkingdata)
+
+library(ggplot2)
+
+ggplot(walkingdata) +
+* aes(x=group)
+```
+]
+ 
+.panel2-walking-auto[
+
+```
+# A tibble: 6 x 6
+  patid group    time sex     age department
+  &lt;dbl&gt; &lt;chr&gt;   &lt;dbl&gt; &lt;chr&gt; &lt;dbl&gt; &lt;fct&gt;     
+1     1 treat    1.90 M        53 3         
+2     2 control  3.54 M        61 3         
+3     3 treat    2.93 M        65 1         
+4     4 control  1.82 M        48 2         
+5     5 treat    2.20 M        62 2         
+6     6 control  3.04 M        62 4         
+```
+
+&lt;img src="flipbook_files/figure-html/walking_auto_10_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+
+.panel1-walking-auto[
+
+```r
+library(readxl)
+walkingdata &lt;- read_excel(path="walkingspeed.xlsx",
+                          sheet="fixed")
+walkingdata$department &lt;- factor(walkingdata$department)
+walkingdata$time &lt;- as.numeric(walkingdata$time)
+walkingdata$time[walkingdata$time&gt;100] &lt;- NA
+walkingdata$time[walkingdata$time&lt;1] &lt;- NA
+
+
+head(walkingdata)
+
+library(ggplot2)
+
+ggplot(walkingdata) +
+  aes(x=group) +
+* aes(y=time)
+```
+]
+ 
+.panel2-walking-auto[
+
+```
+# A tibble: 6 x 6
+  patid group    time sex     age department
+  &lt;dbl&gt; &lt;chr&gt;   &lt;dbl&gt; &lt;chr&gt; &lt;dbl&gt; &lt;fct&gt;     
+1     1 treat    1.90 M        53 3         
+2     2 control  3.54 M        61 3         
+3     3 treat    2.93 M        65 1         
+4     4 control  1.82 M        48 2         
+5     5 treat    2.20 M        62 2         
+6     6 control  3.04 M        62 4         
+```
+
+&lt;img src="flipbook_files/figure-html/walking_auto_11_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+
+.panel1-walking-auto[
+
+```r
+library(readxl)
+walkingdata &lt;- read_excel(path="walkingspeed.xlsx",
+                          sheet="fixed")
+walkingdata$department &lt;- factor(walkingdata$department)
+walkingdata$time &lt;- as.numeric(walkingdata$time)
+walkingdata$time[walkingdata$time&gt;100] &lt;- NA
+walkingdata$time[walkingdata$time&lt;1] &lt;- NA
+
+
+head(walkingdata)
+
+library(ggplot2)
+
+ggplot(walkingdata) +
+  aes(x=group) +
+  aes(y=time) +
+
+* geom_boxplot(outlier.shape = NA, fill=NA)
+```
+]
+ 
+.panel2-walking-auto[
+
+```
+# A tibble: 6 x 6
+  patid group    time sex     age department
+  &lt;dbl&gt; &lt;chr&gt;   &lt;dbl&gt; &lt;chr&gt; &lt;dbl&gt; &lt;fct&gt;     
+1     1 treat    1.90 M        53 3         
+2     2 control  3.54 M        61 3         
+3     3 treat    2.93 M        65 1         
+4     4 control  1.82 M        48 2         
+5     5 treat    2.20 M        62 2         
+6     6 control  3.04 M        62 4         
+```
+
+&lt;img src="flipbook_files/figure-html/walking_auto_12_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+
+.panel1-walking-auto[
+
+```r
+library(readxl)
+walkingdata &lt;- read_excel(path="walkingspeed.xlsx",
+                          sheet="fixed")
+walkingdata$department &lt;- factor(walkingdata$department)
+walkingdata$time &lt;- as.numeric(walkingdata$time)
+walkingdata$time[walkingdata$time&gt;100] &lt;- NA
+walkingdata$time[walkingdata$time&lt;1] &lt;- NA
+
+
+head(walkingdata)
+
+library(ggplot2)
+
+ggplot(walkingdata) +
+  aes(x=group) +
+  aes(y=time) +
+
+  geom_boxplot(outlier.shape = NA, fill=NA) +
+* scale_y_log10()
+```
+]
+ 
+.panel2-walking-auto[
+
+```
+# A tibble: 6 x 6
+  patid group    time sex     age department
+  &lt;dbl&gt; &lt;chr&gt;   &lt;dbl&gt; &lt;chr&gt; &lt;dbl&gt; &lt;fct&gt;     
+1     1 treat    1.90 M        53 3         
+2     2 control  3.54 M        61 3         
+3     3 treat    2.93 M        65 1         
+4     4 control  1.82 M        48 2         
+5     5 treat    2.20 M        62 2         
+6     6 control  3.04 M        62 4         
+```
+
+&lt;img src="flipbook_files/figure-html/walking_auto_13_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+
+.panel1-walking-auto[
+
+```r
+library(readxl)
+walkingdata &lt;- read_excel(path="walkingspeed.xlsx",
+                          sheet="fixed")
+walkingdata$department &lt;- factor(walkingdata$department)
+walkingdata$time &lt;- as.numeric(walkingdata$time)
+walkingdata$time[walkingdata$time&gt;100] &lt;- NA
+walkingdata$time[walkingdata$time&lt;1] &lt;- NA
+
+
+head(walkingdata)
+
+library(ggplot2)
+
+ggplot(walkingdata) +
+  aes(x=group) +
+  aes(y=time) +
+
+  geom_boxplot(outlier.shape = NA, fill=NA) +
+  scale_y_log10() +
+* scale_x_discrete(na.translate=FALSE)
+```
+]
+ 
+.panel2-walking-auto[
+
+```
+# A tibble: 6 x 6
+  patid group    time sex     age department
+  &lt;dbl&gt; &lt;chr&gt;   &lt;dbl&gt; &lt;chr&gt; &lt;dbl&gt; &lt;fct&gt;     
+1     1 treat    1.90 M        53 3         
+2     2 control  3.54 M        61 3         
+3     3 treat    2.93 M        65 1         
+4     4 control  1.82 M        48 2         
+5     5 treat    2.20 M        62 2         
+6     6 control  3.04 M        62 4         
+```
+
+&lt;img src="flipbook_files/figure-html/walking_auto_14_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+
+.panel1-walking-auto[
+
+```r
+library(readxl)
+walkingdata &lt;- read_excel(path="walkingspeed.xlsx",
+                          sheet="fixed")
+walkingdata$department &lt;- factor(walkingdata$department)
+walkingdata$time &lt;- as.numeric(walkingdata$time)
+walkingdata$time[walkingdata$time&gt;100] &lt;- NA
+walkingdata$time[walkingdata$time&lt;1] &lt;- NA
+
+
+head(walkingdata)
+
+library(ggplot2)
+
+ggplot(walkingdata) +
+  aes(x=group) +
+  aes(y=time) +
+
+  geom_boxplot(outlier.shape = NA, fill=NA) +
+  scale_y_log10() +
+  scale_x_discrete(na.translate=FALSE) +
+* labs(x="Treatment Group")
+```
+]
+ 
+.panel2-walking-auto[
+
+```
+# A tibble: 6 x 6
+  patid group    time sex     age department
+  &lt;dbl&gt; &lt;chr&gt;   &lt;dbl&gt; &lt;chr&gt; &lt;dbl&gt; &lt;fct&gt;     
+1     1 treat    1.90 M        53 3         
+2     2 control  3.54 M        61 3         
+3     3 treat    2.93 M        65 1         
+4     4 control  1.82 M        48 2         
+5     5 treat    2.20 M        62 2         
+6     6 control  3.04 M        62 4         
+```
+
+&lt;img src="flipbook_files/figure-html/walking_auto_15_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+
+.panel1-walking-auto[
+
+```r
+library(readxl)
+walkingdata &lt;- read_excel(path="walkingspeed.xlsx",
+                          sheet="fixed")
+walkingdata$department &lt;- factor(walkingdata$department)
+walkingdata$time &lt;- as.numeric(walkingdata$time)
+walkingdata$time[walkingdata$time&gt;100] &lt;- NA
+walkingdata$time[walkingdata$time&lt;1] &lt;- NA
+
+
+head(walkingdata)
+
+library(ggplot2)
+
+ggplot(walkingdata) +
+  aes(x=group) +
+  aes(y=time) +
+
+  geom_boxplot(outlier.shape = NA, fill=NA) +
+  scale_y_log10() +
+  scale_x_discrete(na.translate=FALSE) +
+  labs(x="Treatment Group") +
+* labs(y="Time (seconds)")
+```
+]
+ 
+.panel2-walking-auto[
+
+```
+# A tibble: 6 x 6
+  patid group    time sex     age department
+  &lt;dbl&gt; &lt;chr&gt;   &lt;dbl&gt; &lt;chr&gt; &lt;dbl&gt; &lt;fct&gt;     
+1     1 treat    1.90 M        53 3         
+2     2 control  3.54 M        61 3         
+3     3 treat    2.93 M        65 1         
+4     4 control  1.82 M        48 2         
+5     5 treat    2.20 M        62 2         
+6     6 control  3.04 M        62 4         
+```
+
+&lt;img src="flipbook_files/figure-html/walking_auto_16_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+
+.panel1-walking-auto[
+
+```r
+library(readxl)
+walkingdata &lt;- read_excel(path="walkingspeed.xlsx",
+                          sheet="fixed")
+walkingdata$department &lt;- factor(walkingdata$department)
+walkingdata$time &lt;- as.numeric(walkingdata$time)
+walkingdata$time[walkingdata$time&gt;100] &lt;- NA
+walkingdata$time[walkingdata$time&lt;1] &lt;- NA
+
+
+head(walkingdata)
+
+library(ggplot2)
+
+ggplot(walkingdata) +
+  aes(x=group) +
+  aes(y=time) +
+
+  geom_boxplot(outlier.shape = NA, fill=NA) +
+  scale_y_log10() +
+  scale_x_discrete(na.translate=FALSE) +
+  labs(x="Treatment Group") +
+  labs(y="Time (seconds)") +
+* facet_wrap(~sex)
+```
+]
+ 
+.panel2-walking-auto[
+
+```
+# A tibble: 6 x 6
+  patid group    time sex     age department
+  &lt;dbl&gt; &lt;chr&gt;   &lt;dbl&gt; &lt;chr&gt; &lt;dbl&gt; &lt;fct&gt;     
+1     1 treat    1.90 M        53 3         
+2     2 control  3.54 M        61 3         
+3     3 treat    2.93 M        65 1         
+4     4 control  1.82 M        48 2         
+5     5 treat    2.20 M        62 2         
+6     6 control  3.04 M        62 4         
+```
+
+&lt;img src="flipbook_files/figure-html/walking_auto_17_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+
+.panel1-walking-auto[
+
+```r
+library(readxl)
+walkingdata &lt;- read_excel(path="walkingspeed.xlsx",
+                          sheet="fixed")
+walkingdata$department &lt;- factor(walkingdata$department)
+walkingdata$time &lt;- as.numeric(walkingdata$time)
+walkingdata$time[walkingdata$time&gt;100] &lt;- NA
+walkingdata$time[walkingdata$time&lt;1] &lt;- NA
+
+
+head(walkingdata)
+
+library(ggplot2)
+
+ggplot(walkingdata) +
+  aes(x=group) +
+  aes(y=time) +
+
+  geom_boxplot(outlier.shape = NA, fill=NA) +
+  scale_y_log10() +
+  scale_x_discrete(na.translate=FALSE) +
+  labs(x="Treatment Group") +
+  labs(y="Time (seconds)") +
+  facet_wrap(~sex) +
+* theme_bw()
+```
+]
+ 
+.panel2-walking-auto[
+
+```
+# A tibble: 6 x 6
+  patid group    time sex     age department
+  &lt;dbl&gt; &lt;chr&gt;   &lt;dbl&gt; &lt;chr&gt; &lt;dbl&gt; &lt;fct&gt;     
+1     1 treat    1.90 M        53 3         
+2     2 control  3.54 M        61 3         
+3     3 treat    2.93 M        65 1         
+4     4 control  1.82 M        48 2         
+5     5 treat    2.20 M        62 2         
+6     6 control  3.04 M        62 4         
+```
+
+&lt;img src="flipbook_files/figure-html/walking_auto_18_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+
+.panel1-walking-auto[
+
+```r
+library(readxl)
+walkingdata &lt;- read_excel(path="walkingspeed.xlsx",
+                          sheet="fixed")
+walkingdata$department &lt;- factor(walkingdata$department)
+walkingdata$time &lt;- as.numeric(walkingdata$time)
+walkingdata$time[walkingdata$time&gt;100] &lt;- NA
+walkingdata$time[walkingdata$time&lt;1] &lt;- NA
+
+
+head(walkingdata)
+
+library(ggplot2)
+
+ggplot(walkingdata) +
+  aes(x=group) +
+  aes(y=time) +
+
+  geom_boxplot(outlier.shape = NA, fill=NA) +
+  scale_y_log10() +
+  scale_x_discrete(na.translate=FALSE) +
+  labs(x="Treatment Group") +
+  labs(y="Time (seconds)") +
+  facet_wrap(~sex) +
+  theme_bw() +
+* coord_flip()
+```
+]
+ 
+.panel2-walking-auto[
+
+```
+# A tibble: 6 x 6
+  patid group    time sex     age department
+  &lt;dbl&gt; &lt;chr&gt;   &lt;dbl&gt; &lt;chr&gt; &lt;dbl&gt; &lt;fct&gt;     
+1     1 treat    1.90 M        53 3         
+2     2 control  3.54 M        61 3         
+3     3 treat    2.93 M        65 1         
+4     4 control  1.82 M        48 2         
+5     5 treat    2.20 M        62 2         
+6     6 control  3.04 M        62 4         
+```
+
+&lt;img src="flipbook_files/figure-html/walking_auto_19_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+
+.panel1-walking-auto[
+
+```r
+library(readxl)
+walkingdata &lt;- read_excel(path="walkingspeed.xlsx",
+                          sheet="fixed")
+walkingdata$department &lt;- factor(walkingdata$department)
+walkingdata$time &lt;- as.numeric(walkingdata$time)
+walkingdata$time[walkingdata$time&gt;100] &lt;- NA
+walkingdata$time[walkingdata$time&lt;1] &lt;- NA
+
+
+head(walkingdata)
+
+library(ggplot2)
+
+ggplot(walkingdata) +
+  aes(x=group) +
+  aes(y=time) +
+
+  geom_boxplot(outlier.shape = NA, fill=NA) +
+  scale_y_log10() +
+  scale_x_discrete(na.translate=FALSE) +
+  labs(x="Treatment Group") +
+  labs(y="Time (seconds)") +
+  facet_wrap(~sex) +
+  theme_bw() +
+  coord_flip() +
+* ggtitle("The relationship between walking
+* speed and treatment group, stratified by sex")
+```
+]
+ 
+.panel2-walking-auto[
+
+```
+# A tibble: 6 x 6
+  patid group    time sex     age department
+  &lt;dbl&gt; &lt;chr&gt;   &lt;dbl&gt; &lt;chr&gt; &lt;dbl&gt; &lt;fct&gt;     
+1     1 treat    1.90 M        53 3         
+2     2 control  3.54 M        61 3         
+3     3 treat    2.93 M        65 1         
+4     4 control  1.82 M        48 2         
+5     5 treat    2.20 M        62 2         
+6     6 control  3.04 M        62 4         
+```
+
+&lt;img src="flipbook_files/figure-html/walking_auto_20_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+
+.panel1-walking-auto[
+
+```r
+library(readxl)
+walkingdata &lt;- read_excel(path="walkingspeed.xlsx",
+                          sheet="fixed")
+walkingdata$department &lt;- factor(walkingdata$department)
+walkingdata$time &lt;- as.numeric(walkingdata$time)
+walkingdata$time[walkingdata$time&gt;100] &lt;- NA
+walkingdata$time[walkingdata$time&lt;1] &lt;- NA
+
+
+head(walkingdata)
+
+library(ggplot2)
+
+ggplot(walkingdata) +
+  aes(x=group) +
+  aes(y=time) +
+
+  geom_boxplot(outlier.shape = NA, fill=NA) +
+  scale_y_log10() +
+  scale_x_discrete(na.translate=FALSE) +
+  labs(x="Treatment Group") +
+  labs(y="Time (seconds)") +
+  facet_wrap(~sex) +
+  theme_bw() +
+  coord_flip() +
+  ggtitle("The relationship between walking
+  speed and treatment group, stratified by sex")
+```
+]
+ 
+.panel2-walking-auto[
+
+```
+# A tibble: 6 x 6
+  patid group    time sex     age department
+  &lt;dbl&gt; &lt;chr&gt;   &lt;dbl&gt; &lt;chr&gt; &lt;dbl&gt; &lt;fct&gt;     
+1     1 treat    1.90 M        53 3         
+2     2 control  3.54 M        61 3         
+3     3 treat    2.93 M        65 1         
+4     4 control  1.82 M        48 2         
+5     5 treat    2.20 M        62 2         
+6     6 control  3.04 M        62 4         
+```
+
+&lt;img src="flipbook_files/figure-html/walking_auto_21_output-1.png" width="432" /&gt;
+]
+
+&lt;style&gt;
+.panel1-walking-auto {
+  color: black;
+  width: 49%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel2-walking-auto {
+  color: black;
+  width: 49%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel3-walking-auto {
+  color: black;
+  width: NA%;
+  hight: 33%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+---
+
+count: false
+ 
+
+.panel1-walking-rotate[
+
+```r
+library(readxl)
+walkingdata &lt;- read_excel(path="walkingspeed.xlsx",
+                          sheet="fixed")
+walkingdata$department &lt;- factor(walkingdata$department)
+walkingdata$time &lt;- as.numeric(walkingdata$time)
+walkingdata$time[walkingdata$time&gt;100] &lt;- NA
+walkingdata$time[walkingdata$time&lt;1] &lt;- NA
+
+
+head(walkingdata)
+
+library(ggplot2)
+
+ggplot(walkingdata) +
+  aes(x=group) +
+  aes(y=time) +
+
+* geom_point() +
+  geom_boxplot(outlier.shape = NA, fill=NA) +
+  scale_y_log10() +
+  scale_x_discrete(na.translate=FALSE) +
+  labs(x="Treatment Group") +
+  labs(y="Time (seconds)") +
+  facet_wrap(~sex) +
+  theme_bw() +
+  coord_flip() +
+  ggtitle("The relationship between walking
+  speed and treatment group, stratified by sex")
+```
+]
+ 
+.panel2-walking-rotate[
+
+```
+# A tibble: 6 x 6
+  patid group    time sex     age department
+  &lt;dbl&gt; &lt;chr&gt;   &lt;dbl&gt; &lt;chr&gt; &lt;dbl&gt; &lt;fct&gt;     
+1     1 treat    1.90 M        53 3         
+2     2 control  3.54 M        61 3         
+3     3 treat    2.93 M        65 1         
+4     4 control  1.82 M        48 2         
+5     5 treat    2.20 M        62 2         
+6     6 control  3.04 M        62 4         
+```
+
+&lt;img src="flipbook_files/figure-html/walking_rotate_01_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+
+.panel1-walking-rotate[
+
+```r
+library(readxl)
+walkingdata &lt;- read_excel(path="walkingspeed.xlsx",
+                          sheet="fixed")
+walkingdata$department &lt;- factor(walkingdata$department)
+walkingdata$time &lt;- as.numeric(walkingdata$time)
+walkingdata$time[walkingdata$time&gt;100] &lt;- NA
+walkingdata$time[walkingdata$time&lt;1] &lt;- NA
+
+
+head(walkingdata)
+
+library(ggplot2)
+
+ggplot(walkingdata) +
+  aes(x=group) +
+  aes(y=time) +
+
+* geom_point(size=2) +
+  geom_boxplot(outlier.shape = NA, fill=NA) +
+  scale_y_log10() +
+  scale_x_discrete(na.translate=FALSE) +
+  labs(x="Treatment Group") +
+  labs(y="Time (seconds)") +
+  facet_wrap(~sex) +
+  theme_bw() +
+  coord_flip() +
+  ggtitle("The relationship between walking
+  speed and treatment group, stratified by sex")
+```
+]
+ 
+.panel2-walking-rotate[
+
+```
+# A tibble: 6 x 6
+  patid group    time sex     age department
+  &lt;dbl&gt; &lt;chr&gt;   &lt;dbl&gt; &lt;chr&gt; &lt;dbl&gt; &lt;fct&gt;     
+1     1 treat    1.90 M        53 3         
+2     2 control  3.54 M        61 3         
+3     3 treat    2.93 M        65 1         
+4     4 control  1.82 M        48 2         
+5     5 treat    2.20 M        62 2         
+6     6 control  3.04 M        62 4         
+```
+
+&lt;img src="flipbook_files/figure-html/walking_rotate_02_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+
+.panel1-walking-rotate[
+
+```r
+library(readxl)
+walkingdata &lt;- read_excel(path="walkingspeed.xlsx",
+                          sheet="fixed")
+walkingdata$department &lt;- factor(walkingdata$department)
+walkingdata$time &lt;- as.numeric(walkingdata$time)
+walkingdata$time[walkingdata$time&gt;100] &lt;- NA
+walkingdata$time[walkingdata$time&lt;1] &lt;- NA
+
+
+head(walkingdata)
+
+library(ggplot2)
+
+ggplot(walkingdata) +
+  aes(x=group) +
+  aes(y=time) +
+
+* geom_point(size=2,aes(shape=department)) +
+  geom_boxplot(outlier.shape = NA, fill=NA) +
+  scale_y_log10() +
+  scale_x_discrete(na.translate=FALSE) +
+  labs(x="Treatment Group") +
+  labs(y="Time (seconds)") +
+  facet_wrap(~sex) +
+  theme_bw() +
+  coord_flip() +
+  ggtitle("The relationship between walking
+  speed and treatment group, stratified by sex")
+```
+]
+ 
+.panel2-walking-rotate[
+
+```
+# A tibble: 6 x 6
+  patid group    time sex     age department
+  &lt;dbl&gt; &lt;chr&gt;   &lt;dbl&gt; &lt;chr&gt; &lt;dbl&gt; &lt;fct&gt;     
+1     1 treat    1.90 M        53 3         
+2     2 control  3.54 M        61 3         
+3     3 treat    2.93 M        65 1         
+4     4 control  1.82 M        48 2         
+5     5 treat    2.20 M        62 2         
+6     6 control  3.04 M        62 4         
+```
+
+&lt;img src="flipbook_files/figure-html/walking_rotate_03_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+
+.panel1-walking-rotate[
+
+```r
+library(readxl)
+walkingdata &lt;- read_excel(path="walkingspeed.xlsx",
+                          sheet="fixed")
+walkingdata$department &lt;- factor(walkingdata$department)
+walkingdata$time &lt;- as.numeric(walkingdata$time)
+walkingdata$time[walkingdata$time&gt;100] &lt;- NA
+walkingdata$time[walkingdata$time&lt;1] &lt;- NA
+
+
+head(walkingdata)
+
+library(ggplot2)
+
+ggplot(walkingdata) +
+  aes(x=group) +
+  aes(y=time) +
+
+* geom_point(size=2,aes(shape=department),position=position_jitter(width=0.1)) +
+  geom_boxplot(outlier.shape = NA, fill=NA) +
+  scale_y_log10() +
+  scale_x_discrete(na.translate=FALSE) +
+  labs(x="Treatment Group") +
+  labs(y="Time (seconds)") +
+  facet_wrap(~sex) +
+  theme_bw() +
+  coord_flip() +
+  ggtitle("The relationship between walking
+  speed and treatment group, stratified by sex")
+```
+]
+ 
+.panel2-walking-rotate[
+
+```
+# A tibble: 6 x 6
+  patid group    time sex     age department
+  &lt;dbl&gt; &lt;chr&gt;   &lt;dbl&gt; &lt;chr&gt; &lt;dbl&gt; &lt;fct&gt;     
+1     1 treat    1.90 M        53 3         
+2     2 control  3.54 M        61 3         
+3     3 treat    2.93 M        65 1         
+4     4 control  1.82 M        48 2         
+5     5 treat    2.20 M        62 2         
+6     6 control  3.04 M        62 4         
+```
+
+&lt;img src="flipbook_files/figure-html/walking_rotate_04_output-1.png" width="432" /&gt;
+]
+
+&lt;style&gt;
+.panel1-walking-rotate {
+  color: black;
+  width: 49%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel2-walking-rotate {
+  color: black;
+  width: 49%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel3-walking-rotate {
+  color: black;
+  width: NA%;
+  hight: 33%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+
+
+
+---
+
+
+count: false
+ 
+
+.panel1-walking2-rotate[
+
+```r
+library(readxl)
+walkingdata &lt;- read_excel(path="walkingspeed.xlsx",
+                          sheet="fixed")
+walkingdata$department &lt;- factor(walkingdata$department)
+walkingdata$time &lt;- as.numeric(walkingdata$time)
+walkingdata$time[walkingdata$time&gt;100] &lt;- NA
+walkingdata$time[walkingdata$time&lt;1] &lt;- NA
+head(walkingdata)
+
+library(ggplot2)
+
+ggplot(walkingdata) +
+  aes(x=group) +
+  aes(y=time) +
+* geom_boxplot(outlier.shape = NA) +
+  scale_y_log10() +
+  scale_x_discrete(na.translate=FALSE) +
+  labs(x="Treatment Group") +
+  labs(y="Time (seconds)") +
+  facet_wrap(~sex) +
+  theme_bw() +
+  coord_flip()  +
+  ggtitle("The relationship between walking
+  speed and treatment group, stratified by sex")
+```
+]
+ 
+.panel2-walking2-rotate[
+
+```
+# A tibble: 6 x 6
+  patid group    time sex     age department
+  &lt;dbl&gt; &lt;chr&gt;   &lt;dbl&gt; &lt;chr&gt; &lt;dbl&gt; &lt;fct&gt;     
+1     1 treat    1.90 M        53 3         
+2     2 control  3.54 M        61 3         
+3     3 treat    2.93 M        65 1         
+4     4 control  1.82 M        48 2         
+5     5 treat    2.20 M        62 2         
+6     6 control  3.04 M        62 4         
+```
+
+&lt;img src="flipbook_files/figure-html/walking2_rotate_01_output-1.png" width="432" /&gt;
+]
+
+---
+count: false
+ 
+
+.panel1-walking2-rotate[
+
+```r
+library(readxl)
+walkingdata &lt;- read_excel(path="walkingspeed.xlsx",
+                          sheet="fixed")
+walkingdata$department &lt;- factor(walkingdata$department)
+walkingdata$time &lt;- as.numeric(walkingdata$time)
+walkingdata$time[walkingdata$time&gt;100] &lt;- NA
+walkingdata$time[walkingdata$time&lt;1] &lt;- NA
+head(walkingdata)
+
+library(ggplot2)
+
+ggplot(walkingdata) +
+  aes(x=group) +
+  aes(y=time) +
+* stat_summary(geom="pointrange",fun.data=mean_se) +
+  scale_y_log10() +
+  scale_x_discrete(na.translate=FALSE) +
+  labs(x="Treatment Group") +
+  labs(y="Time (seconds)") +
+  facet_wrap(~sex) +
+  theme_bw() +
+  coord_flip()  +
+  ggtitle("The relationship between walking
+  speed and treatment group, stratified by sex")
+```
+]
+ 
+.panel2-walking2-rotate[
+
+```
+# A tibble: 6 x 6
+  patid group    time sex     age department
+  &lt;dbl&gt; &lt;chr&gt;   &lt;dbl&gt; &lt;chr&gt; &lt;dbl&gt; &lt;fct&gt;     
+1     1 treat    1.90 M        53 3         
+2     2 control  3.54 M        61 3         
+3     3 treat    2.93 M        65 1         
+4     4 control  1.82 M        48 2         
+5     5 treat    2.20 M        62 2         
+6     6 control  3.04 M        62 4         
+```
+
+&lt;img src="flipbook_files/figure-html/walking2_rotate_02_output-1.png" width="432" /&gt;
+]
+
+&lt;style&gt;
+.panel1-walking2-rotate {
+  color: black;
+  width: 49%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel2-walking2-rotate {
+  color: black;
+  width: 49%;
+  hight: 32%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+.panel3-walking2-rotate {
+  color: black;
+  width: NA%;
+  hight: 33%;
+  float: left;
+  padding-left: 1%;
+  font-size: 80%
+}
+&lt;/style&gt;
+
+
+
+
+
+
+
+&lt;style type="text/css"&gt;
+.remark-code{line-height: 1.5; font-size: 80%}
+
+@media print {
+  .has-continuation {
+    display: block;
+  }
+}
+
+code.r.hljs.remark-code{
+  position: relative;
+  overflow-x: hidden;
+}
+
+
+code.r.hljs.remark-code:hover{
+  overflow-x:visible;
+  width: 500px;
+  border-style: solid;
+}
+&lt;/style&gt;
+
+
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:9",
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

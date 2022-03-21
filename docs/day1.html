@@ -1,0 +1,1179 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="George Savva, (QIB)" />
+
+
+<title>Introduction to ‘R’ statistical software for statistical analysis</title>
+
+<script src="site_libs/header-attrs-2.10/header-attrs.js"></script>
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet" />
+<script src="site_libs/pagedtable-1.1/js/pagedtable.js"></script>
+<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.tab('show');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">R for Statistics</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">
+    <span class="fa fa-home"></span>
+     
+    Home
+  </a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Intro to R for Statistics
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="day1.html">Part 1</a>
+    </li>
+    <li>
+      <a href="day2.html">Part 2</a>
+    </li>
+    <li>
+      <a href="workshopscript.html">JIC MSc Workshop</a>
+    </li>
+    <li>
+      <a href="flipbook.html">ggplot example</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Statistics notes
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="dichot.html">Don't group your data points</a>
+    </li>
+  </ul>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="mailto:george.savva@quadram.ac.uk">
+    <span class="fa fa-envelope-o"></span>
+     
+    Contact me
+  </a>
+</li>
+<li>
+  <a href="https://github.com/georgemsavva">
+    <span class="fa fa-github"></span>
+     
+    GitHub
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">Introduction to ‘R’ statistical software for statistical analysis</h1>
+<h4 class="author">George Savva, (QIB)</h4>
+
+</div>
+
+
+<div id="introduction" class="section level1" number="1">
+<h1 number="1"><span class="header-section-number">1</span> Introduction</h1>
+<p>This course will introduce R statistical software, examples of performing common tasks in scientific data analysis, where to go for further support and some tips for good practice when using R.</p>
+<p>The aim is to become familiar with the R/RStudio environment and some common functions and workflows. This will enable you to learn the specific functions that you need on your own or with further training.</p>
+<p>Specifically this course will bring you up to the level you need to attend the externally run statistics courses provided at NBI, that assume a working knowledge of R and RStudio.</p>
+<p>The data you need to complete the training exercises is in the accompanying file (Introstat.xlsx). All of the commands for the worked examples and the exercises is in the file TutorialScript.R. The commands for the worked examples are also typed out here.</p>
+<p>For those who have run through these notes already and completed the exercises there are some additional exercises that you can try to complete during the course.</p>
+<div id="learning-objectives" class="section level2" number="1.1">
+<h2 number="1.1"><span class="header-section-number">1.1</span> Learning objectives</h2>
+<p>We will focus on the tasks used in a typical analysis of a single scientific dataset, mirroring the tasks usually conducted in other statistical software.</p>
+<div id="specific-tasks" class="section level3" number="1.1.1">
+<h3 number="1.1.1"><span class="header-section-number">1.1.1</span> Specific tasks:</h3>
+<p>Day 1: R and RStudio basics</p>
+<ul>
+<li>Making an Rstudio project</li>
+<li>Loading packages</li>
+<li>Loading a dataset into R from an Excel file</li>
+<li>Exploring your data and calculating descriptive statistics</li>
+<li>Simple hypothesis tests</li>
+</ul>
+<p>Day 2: Linear models</p>
+<ul>
+<li>Estimating, diagnosing and reporting a regression model</li>
+</ul>
+<p>Day 3: Graphics</p>
+<ul>
+<li>Making graphics using ‘base’ graphics and the ggplot2 package</li>
+</ul>
+</div>
+<div id="how-to-use-r" class="section level3" number="1.1.2">
+<h3 number="1.1.2"><span class="header-section-number">1.1.2</span> How to use R</h3>
+<ul>
+<li>Using R and RStudio</li>
+<li>RStudio ‘projects’ and a good workflow</li>
+<li>The command line interface</li>
+<li>Using scripts for reproducibility</li>
+<li>Getting help</li>
+<li>Using packages</li>
+</ul>
+</div>
+<div id="how-r-works" class="section level3" number="1.1.3">
+<h3 number="1.1.3"><span class="header-section-number">1.1.3</span> How R works</h3>
+<ul>
+<li>Objects and functions</li>
+<li>Data frames and vectors</li>
+<li>Types of data: numerics, factors, and strings</li>
+<li>Representing and handling ‘missing’ values</li>
+<li>The importance of ‘tidy’ data</li>
+</ul>
+</div>
+</div>
+</div>
+<div id="intro" class="section level1" number="2">
+<h1 number="2"><span class="header-section-number">2</span> Getting R and RStudio</h1>
+<div id="what-are-r-and-rstudio" class="section level2" number="2.1">
+<h2 number="2.1"><span class="header-section-number">2.1</span> What are R and RStudio?</h2>
+<p>R is a free and open source statistics package, initially developed during the 1990s, and that has now become the world’s most widely used and comprehensive statistical software. R calls itself a ‘programming language <em>and</em> environment for statistic computing’.</p>
+<p>That is, ‘R’ refers both to the software itself and the programming language that you use to interact with it.</p>
+<p>RStudio is a free open source integrated development environment (IDE) for R that makes working R much easier. Most R users use RStudio and I recommend using RStudio for new users.</p>
+<p>The great strength of R is in its contributed packages, these are community written add-ons that provide functions to help you perform almost any statistical, programming, or data-related task. We will introduce some commonly used packages for data management, analysis and graphing during this course.</p>
+</div>
+<div id="exercise-1.-getting-started" class="section level2" number="2.2">
+<h2 number="2.2"><span class="header-section-number">2.2</span> Exercise 1. Getting started</h2>
+<div id="getting-r-and-rstudio" class="section level3" number="2.2.1">
+<h3 number="2.2.1"><span class="header-section-number">2.2.1</span> Getting R and RStudio</h3>
+<ol style="list-style-type: decimal">
+<li><p>Download and install the latest version of R from <a href="https://cran.r-project.org/" class="uri">https://cran.r-project.org/</a></p></li>
+<li><p>Then download and install RStudio from <a href="https://www.rstudio.com/" class="uri">https://www.rstudio.com/</a></p></li>
+<li><p>Start RStudio. It will detect your installation of R, and you should see a screen like this:</p></li>
+</ol>
+<div class="figure">
+<img src="images/rstudio.png" alt="" />
+<p class="caption">Figure: RStudio Window</p>
+</div>
+<p>On the left is the console window, where you type commands and see output. The windows on the right hold various useful tabs, here the top pane is showing the data I happen to currently have loaded in my environment (yours will initially be empty) and a viewer showing part of my filesystem at the bottom. These right-hand windows can also show graphs, help files, and your command history.</p>
+</div>
+<div id="check-r-and-rstudio-are-working-run-your-first-command" class="section level3" number="2.2.2">
+<h3 number="2.2.2"><span class="header-section-number">2.2.2</span> Check R and RStudio are working, run your first command</h3>
+<ol start="4" style="list-style-type: decimal">
+<li>Click in the console window and type:</li>
+</ol>
+<pre class="r"><code>1+2</code></pre>
+<p>Press return on your keyboard. You should see:</p>
+<pre><code>## [1] 3</code></pre>
+<p>This is the basic way in which R works. We enter commands at the command prompt, and we get the output in the console window.</p>
+<ol start="5" style="list-style-type: decimal">
+<li>Try a few other mathematical functions at the R console. Can you use R to find:
+<ol style="list-style-type: lower-alpha">
+<li>The natural logarithm of 10</li>
+<li>The square root of 2</li>
+<li>The cube root of 10</li>
+</ol></li>
+</ol>
+</div>
+</div>
+</div>
+<div id="using-projects-and-scripts" class="section level1" number="3">
+<h1 number="3"><span class="header-section-number">3</span> Using projects and scripts</h1>
+<p>Before we go any further, we are going to start an RStudio ‘project’ to organise our work during this course. Using projects helps us to keep all of the data and analysis for a particular piece of work in the same place.</p>
+<p>Click on ‘New → New project’ in the main toolbar. Click ‘Start a new project in a brand new working directory’. Then click ‘new project’ on the next screen.</p>
+<p>Now you can choose where to create the new directory for your R project, and what to call it. Make a project called ‘Rtraining’ or something like that, somewhere in your personal filestore.</p>
+<p>Now, when you return to the main RStudio window you are working within your project. Notice that the ‘working directory’ has automatically switched to the new directory that you created, and the ‘files’ tab on the bottom left of the window is now showing the root of the project directory you created.</p>
+<div id="making-a-script" class="section level2" number="3.1">
+<h2 number="3.1"><span class="header-section-number">3.1</span> Making a script</h2>
+<p>We could do everything by typing commands into the console window as we have already seen, but this is not good if we want to remember or repeat something we have done, or share it with others.</p>
+<p>So instead we will type our commands into files called R scripts and run the commands from there. With a script you can run and re-run bigger analyses that chain together all the functions you need for data loading, cleaning, analysing, reporting etc.</p>
+<p>Using scripts mean we can develop complex analyses, and that when we come back to them later, eg if something changes in our data that means we need to redo everything, or we want to tweak something in our analysis because of a reviewer’s comment, we can easily do this without having to remember or reconstruct what we did.</p>
+<p>It is good to keep a separate R script for each analysis that you do, such that each starts with the functions to load the required data, do any cleaning or coding that is necessary, then to perform and report the data analysis.</p>
+<p>I have made an example of such a script, annotated with comments, in the files that accompany this handout.</p>
+</div>
+<div id="worked-example-1.-make-a-script" class="section level2" number="3.2">
+<h2 number="3.2"><span class="header-section-number">3.2</span> Worked Example 1. Make a script</h2>
+<ol style="list-style-type: decimal">
+<li><p>Make a new script. Click on File → New File → R Script in the main RStudio window. An empty file will appear in the top-left pane.</p></li>
+<li><p>Save your script with a sensible filename (even though it is empty). Having unsaved scripts is a bad idea, RStudio is sometimes unstable and while it will try to recover unsaved work it is not always guaranteed to. Get into the habit of saving your scripts regularly.</p></li>
+<li><p>Put some of the mathematical functions that you have already tried into your script, with one on each line.</p></li>
+</ol>
+<p>You can now run code from scripts in several ways.</p>
+<ol style="list-style-type: decimal">
+<li>If you press ‘run’ or type Ctrl+Enter on the keyboard, RStudio will send the line that the cursor is on to the R console and will run it. (Rstudio will try to identify if that line is a part of a multiline command - which may or may not work).</li>
+<li>If you highlight an area of the script and then hit ‘run’ (or press Ctrl+Enter) then RStudio will send all the highlighted code to the R console.</li>
+<li>If you save the file, then press ‘source’, R will load the file from disk and run all the commands from that file in sequence. Doing this you won’t see any output unless you specifically ask for it (or press ‘source with echo’).</li>
+</ol>
+<p>There are some subtle differences between what happens with run and source, but in general you can use either. I typically use ‘run’ while developing scripts and ‘source’ when they are finished to get the final answers.</p>
+<p>If you have your raw data saved, and you keep your scripts, then you don’t need to save your results or any of the variables that you generated or modified during your analysis. So long as the orginal data doesn’t change, running the script will reproduce all of your analysis and output. This is a better way of working than trying to save your environment with all of your results and tables in.</p>
+<p>I have created a script including all the analyses from this tutorial, in TutorialScript.R. Load this and have a look around. Notice my comments to remind myself why I did things, this might be helpful when I next come to revise the analysis!</p>
+<p><strong>Important:</strong> Keep the R scripts and the data associated with this training course in the project directory, so that you can access them easily.</p>
+<p>See:</p>
+<ul>
+<li><a href="https://r4ds.had.co.nz/workflow-projects.html" class="uri">https://r4ds.had.co.nz/workflow-projects.html</a></li>
+<li><a href="https://support.rstudio.com/hc/en-us/articles/200526207-Using-Projects" class="uri">https://support.rstudio.com/hc/en-us/articles/200526207-Using-Projects</a></li>
+<li><a href="https://rstats.wtf" class="uri">https://rstats.wtf</a></li>
+</ul>
+<p>for more information on using projects and scripts</p>
+</div>
+<div id="worked-example-2.-object-assigments" class="section level2" number="3.3">
+<h2 number="3.3"><span class="header-section-number">3.3</span> Worked Example 2. Object assigments</h2>
+<p>So far we have used R as a calculator. Next we’ll learn about how R stores data and applies data management or analysis functions to data. First some terminology:</p>
+<div id="functions" class="section level3" number="3.3.1">
+<h3 number="3.3.1"><span class="header-section-number">3.3.1</span> Functions</h3>
+<p>Everything in R is done by executing ‘functions’. When you typed <code>1+2</code> at the console above you were calling the <code>+</code> function, with <code>1</code> and <code>2</code> as its arguments, and the result was printed in the console window.</p>
+<p>Simple mathematical functions can be written using standard notation in this way (eg <code>1+2</code> or <code>3/4</code>) but functions are more commonly called by their <em>name</em>, with their <em>arguments</em> in brackets, separated by commas. For example, to get say the logarithm (base 10) of 100, we would type</p>
+<pre class="r"><code>### Try this directly in the console, and by running it from your new script.
+log(x=100, base=10)</code></pre>
+<pre><code>## [1] 2</code></pre>
+<p>Here, <code>log</code> is the name of the function, with <code>x</code> and <code>base</code> its arguments. The result (2) is the <em>value</em> of the function (the value is what is returned).</p>
+<p>Try each of the following commands. Do you understand what they do any why?</p>
+<pre class="r"><code>### From now on, keep everything you try in a script file.
+
+log(x=100, base=10)
+log(x=100)
+log(base=10, x=100)
+log(100,10)
+log(10,100)
+log()
+log</code></pre>
+<p><em>Note for the interested:</em> the <code>+</code> symbol is an example of an ‘infix operator’, that is a special kind of function that can be called with its arguments placed on either side (eg <code>1+2</code>). You can still call the function the regular way if you want to, ie <code>`+`(1,2)</code>. As well as the usual mathematical operators there are a few other useful infix operators, most usefully <code>%in%</code> (to test whether a vector contains a particular element, eg <code>3 %in% c(1,2,3)</code> would return <code>TRUE</code>).</p>
+</div>
+<div id="objects" class="section level3" number="3.3.2">
+<h3 number="3.3.2"><span class="header-section-number">3.3.2</span> Objects</h3>
+<p>Instead of directly displaying the value of the function (‘value’ is what R calls the result of a function), you can give it a name and store it for later use:</p>
+<pre class="r"><code>x = 1+2</code></pre>
+<p>The <code>=</code> in this context represents ‘assignment’. The line above says:</p>
+<p>‘evaluate 1+2, and store the result in an object called x’ or more simply ‘assign the value of 1+2 to x’.</p>
+<p>You might find it easier to understand:</p>
+<pre class="r"><code>x &lt;- 1+2</code></pre>
+<p>This does exactly the same thing; some R users use the arrow <code>&lt;-</code> instead of <code>=</code> for assignment, so both forms will come up when you’re looking at help or other people’s code. I (annoyingly!) tend to use either interchangeably.</p>
+<p>So now you have an object called <code>x</code> in your <em>environment</em> that holds the number 3. You can ask R to display the value of ‘x’ by just entering x (just entering the name of an object <em>prints</em> that object):</p>
+<pre class="r"><code>x</code></pre>
+<pre><code>## [1] 3</code></pre>
+<p>Or you could do something else with <code>x</code></p>
+<pre class="r"><code>x*2</code></pre>
+<pre><code>## [1] 6</code></pre>
+<p>Note your new object and its value should now have appeared in the ‘Environment’ pane in RStudio.</p>
+<p>To see the <em>class</em> of an object (what kind of thing is stored in the object), use the <code>class()</code> function.</p>
+<pre class="r"><code>class(x)</code></pre>
+<pre><code>## [1] &quot;numeric&quot;</code></pre>
+<p>Objects of different classes store different kinds of information. We will come across objects of many different classes later.</p>
+</div>
+</div>
+<div id="exercise-2.-more-functions-and-assigning-values-to-variables" class="section level2" number="3.4">
+<h2 number="3.4"><span class="header-section-number">3.4</span> Exercise 2. More functions, and assigning values to variables</h2>
+<ol style="list-style-type: decimal">
+<li>Make a new object called y which has the value of x+3. Then display y.</li>
+<li>Now change the value of x (eg using x &lt;- 6 ). Does the value of y change?</li>
+<li>Objects can hold text strings instead of numbers. Try:</li>
+</ol>
+<pre class="r"><code>myname &lt;- &quot;George&quot;  #(or whatever your name is).
+myname</code></pre>
+<p>What is the class of the ‘myname’ object?</p>
+<ol start="4" style="list-style-type: decimal">
+<li>(Difficult!) Look up the function to turn a text string into upper case (an internet search will help you). Use this function to make a new object which has the same text as ‘myname’ but in upper case.</li>
+</ol>
+</div>
+</div>
+<div id="types-of-data" class="section level1" number="4">
+<h1 number="4"><span class="header-section-number">4</span> Types of data</h1>
+<p>We saw two object of two different ‘classes’ in the previous exercise. These classes were ‘numeric’ and ‘character’. The class of an object defines what kind of information it hold, and how other functions act on it.</p>
+<p>There are four basic classes (modes) that you will commonly use and should be aware of. These correspond to the types of data you might have. The basic types are:</p>
+<ul>
+<li>‘numeric’ – For keeping numbers, can be discrete or continuous</li>
+<li>‘logical’ – can only take the values (TRUE or FALSE)</li>
+<li>‘character’ – for strings of text</li>
+<li>‘factor’ – for labelled categorical variables (ordered or unordered)</li>
+</ul>
+<p>You might also commonly come across objects of class:</p>
+<ul>
+<li>‘Date’ - which is really just a number but formatted to represent a single date and time. R has a lot of useful functions for working with dates so if you have a dataset that includes dates it is worth exploring this.</li>
+</ul>
+<p>Later in this tutorial we will see objects of more complex classes, these can store lots of different information of different modes:</p>
+<ul>
+<li>‘data.frame’ – storing datasets</li>
+<li>‘lm’ – stores the all results of a linear regression model</li>
+</ul>
+<div id="character-strings" class="section level2" number="4.1">
+<h2 number="4.1"><span class="header-section-number">4.1</span> Character strings</h2>
+<p>Character strings represent text rather than numbers. Strings are used to label categories in a dataset, to identify columns in a dataset, to make your outputs more readable. You also might find that part of your data has been entered as a string, for example patient identifiers or gene names in a database, or responses to open ended questions.</p>
+<p>Strings are identified in R (and in most other programming languages) by enclosing them in quotes. Single quotes and double quotes can be used (and are treated almost identically), but double quotes are preferred. For example try:</p>
+<pre class="r"><code>print(&quot;Hello&quot;)</code></pre>
+<pre><code>## [1] &quot;Hello&quot;</code></pre>
+<pre class="r"><code>print(&#39;Hello&#39;)</code></pre>
+<pre><code>## [1] &quot;Hello&quot;</code></pre>
+<pre class="r"><code># What happens here?
+#print(Hello)</code></pre>
+<p>A common mistake in R is to forget to enclose strings in quotes. In which case R tries to interpret your input as an object name, leading to an error message if that name doesn’t exist.</p>
+</div>
+<div id="logicals" class="section level2" number="4.2">
+<h2 number="4.2"><span class="header-section-number">4.2</span> Logicals</h2>
+<p>Logicals represent binary information in the form <code>TRUE</code> or <code>FALSE</code>. They most often arise as the result of a comparison, for example try:</p>
+<pre class="r"><code>3&gt;2
+
+&quot;Hello&quot; == &quot;hello&quot;  # note the double equals sign, this distinguishes assignment from comparison</code></pre>
+</div>
+<div id="converting-between-types" class="section level2" number="4.3">
+<h2 number="4.3"><span class="header-section-number">4.3</span> Converting between types</h2>
+<p>Sometimes it is possible to convert an object from one class to another. For example, a number might be stored as a character string in your data, and you will need to convert it into a numeric before you can do any analysis with it. For example:</p>
+<pre class="r"><code>x &lt;- &quot;3&quot;
+x*2 # What is the error message here?  What does it mean?
+
+y &lt;- as.numeric(x)
+y*2</code></pre>
+</div>
+<div id="exercise-3.-type-conversion" class="section level2" number="4.4">
+<h2 number="4.4"><span class="header-section-number">4.4</span> Exercise 3. Type conversion</h2>
+<ol style="list-style-type: decimal">
+<li>Try to convert a logical into a numeric. What happens to the values <code>TRUE</code> and <code>FALSE</code> when converted into numbers?</li>
+<li>Make a character string that does not represent a number. Try to convert it into a numeric. What happens?</li>
+</ol>
+</div>
+</div>
+<div id="working-with-vectors" class="section level1" number="5">
+<h1 number="5"><span class="header-section-number">5</span> Working with vectors</h1>
+<p>So now we know how to store individual values of various types, but our datasets are obviously much more complex than this. The next building block is the ‘vector’ which is like a single column of values in a database, all of the same type.</p>
+<p>We’ll soon get on to assembling these into ‘data.frames’ to represent entire datasets, but here we’ll focus on how vectors themselves work.</p>
+<div id="worked-example-3.-creating-and-manipulating-vectors" class="section level2" number="5.1">
+<h2 number="5.1"><span class="header-section-number">5.1</span> Worked Example 3. Creating and manipulating vectors</h2>
+<p>Type the following:</p>
+<pre class="r"><code>a &lt;- c(3,4,5)</code></pre>
+<p>This assigns the vector (3,4,5) to <code>a</code>. <code>c()</code> is a common function in R which simply ‘combines’ its arguments into a vector. So in other words this command says ‘create a vector from the numbers 3,4 and 5, and call this vector object ‘a’.</p>
+<p>Vectors can be any length. Try:</p>
+<pre class="r"><code>b &lt;- 1:10</code></pre>
+<p>What does the <code>:</code> operator do?</p>
+<p>You can display <code>a</code> just as you displayed <code>x</code> previously</p>
+<pre class="r"><code>a</code></pre>
+<pre><code>## [1] 3 4 5</code></pre>
+<p>And as with a single value you can fun more interesting functions on <code>a</code>. Make sure you understand what each of the functions below does and why:</p>
+<pre class="r"><code>a + 1
+
+a * 2
+
+a &gt; 3  # what class does the value of this function have?
+
+a + x
+
+mean(a)
+
+sum(a)
+
+summary(a)</code></pre>
+<pre class="r"><code>plot(a)  # where did your plot appear?</code></pre>
+<p>Notice there are two kinds of function behaviour here. Where a simple mathematical function or comparison was applied, R just appied it to each element of the vector in turn. This is a powerful feature of R whereby you can efficiently peform functions or comparisons on entire columns of data all at once.</p>
+<p>For other functions, like <code>mean()</code> and <code>sum()</code> a single number was returned based on combining the elements of the vector.</p>
+<p>For <code>summary()</code>, the whole vector was used but a more complex output was generated.</p>
+<p>The elements of a vector must all be the same primitive type (that is, they must be all numerics, all character strings, all logicals or all factors)</p>
+</div>
+<div id="exercise-4.-working-with-vectors" class="section level2" number="5.2">
+<h2 number="5.2"><span class="header-section-number">5.2</span> Exercise 4. Working with vectors</h2>
+<p>What happens when you try each of these commands? Can you explain why?</p>
+<pre class="r"><code>vectora &lt;- c(&quot;George&quot;, &quot;Matthew&quot;, &quot;Marielle&quot;)
+vectorb &lt;- c(&quot;Yes&quot;, 3)
+vectorc &lt;- c(1, TRUE)
+
+mean(c(2,4,6))
+
+&quot;Kate&quot; %in% vectora
+
+&quot;George&quot; %in% vectorb
+
+vectorb == &quot;George&quot;
+
+mean(vectorb)</code></pre>
+</div>
+<div id="accessors-and-subsetting" class="section level2" number="5.3">
+<h2 number="5.3"><span class="header-section-number">5.3</span> Accessors and subsetting</h2>
+<p>Accessors allow you to access or change individual elements of a vector. For example, you can ‘subset’ one or more elements of a vector using the <code>[</code> operator as follows.</p>
+<p>Accessors are important because they allow to work with or change only certain parts of a dataset.</p>
+<pre class="r"><code>a[1]</code></pre>
+<pre><code>## [1] 3</code></pre>
+<pre class="r"><code>a[3]</code></pre>
+<pre><code>## [1] 5</code></pre>
+<pre class="r"><code>a[c(2,3)]</code></pre>
+<pre><code>## [1] 4 5</code></pre>
+<p>What happens if you try <code>a[4]</code>. Why?</p>
+<p>As well as specifying the particular elements you want, you can also select elements that meet a certain condition. For example:</p>
+<pre class="r"><code>a[c(FALSE, FALSE, TRUE)]</code></pre>
+<pre><code>## [1] 5</code></pre>
+<p>The statement above is not something we are ever likely to do, but its helpful to understand the following scenario: Suppose we wanted the elements of a that were bigger than 3. Then we would write</p>
+<pre class="r"><code>a[a&gt;3]</code></pre>
+<pre><code>## [1] 4 5</code></pre>
+<p>Here the comparison is applied element-wise, and the elements where the comparison is <code>TRUE</code> are returned.</p>
+<p>So this literally means: “return the values of ‘a’ at the positions where ‘a’ is greater than 3”.</p>
+<p>While this might seem like an odd thing to want to do now, it becomes important later, because this kind of ‘subsetting’ is one way to extract different parts of a dataset for analysis, for example all the men, all the non-missing values, or all the patients with blood pressure greater than 140.</p>
+<p>Individual elements of vectors can also be <em>altered</em> or created using the accessor. For example:</p>
+<pre class="r"><code>a[2] &lt;- 10
+a[5] &lt;- 100
+a</code></pre>
+<pre><code>## [1]   3  10   5  NA 100</code></pre>
+</div>
+<div id="missing-elements-in-vectors" class="section level2" number="5.4">
+<h2 number="5.4"><span class="header-section-number">5.4</span> Missing elements in vectors</h2>
+<p>Often your data will include missing values. R uses <code>NA</code> to represent missing values. For example the following creates a vector with a missing value in the fourth position:</p>
+<pre class="r"><code>myvector &lt;- c(10,21,32,NA,54)</code></pre>
+<p>Note the difference between <code>NA</code> (a missing value) and <code>"NA"</code> (a character string containing the letters N and A. I have been tripped up by this a few times when <code>"NA"</code> has been entered into a dataset.)</p>
+</div>
+<div id="exercise-5.-effect-of-missing-values" class="section level2" number="5.5">
+<h2 number="5.5"><span class="header-section-number">5.5</span> Exercise 5. Effect of missing values</h2>
+<p>Try some other functions with myvector to see what impact the missing data point has.</p>
+<pre class="r"><code>class(myvector)
+
+plot(myvector)
+
+myvector&gt;20
+
+mean(myvector) # what happens here?  Why?  Can you fix it?
+
+is.na(myvector) # what does this do?
+
+sum(is.na(myvector)) # can you explain what this does?</code></pre>
+</div>
+<div id="exercise-6.-get-help" class="section level2" number="5.6">
+<h2 number="5.6"><span class="header-section-number">5.6</span> Exercise 6. Get help!</h2>
+<ol style="list-style-type: decimal">
+<li><p>I can never remember the name of the function to calculate the standard deviation of a numeric vector. Look this up online (eg a google search for ‘standard deviation in R’), and use it to find the standard deviation of ‘a’.</p></li>
+<li><p>Make another numeric vector called ‘b’ (or anything you like; object names don’t have to be single letters).</p></li>
+<li><p>Draw a histogram of that vector (look it up!).</p></li>
+<li><p><strong>Difficult!</strong> Make a vector which is a sample of 100 values from a standard normal distribution (mean 0 and variance 1). (The function <code>rnorm()</code> will help you with this.).</p></li>
+<li><p>Now plot a histogram only of the values that are greater than 0.</p></li>
+</ol>
+</div>
+</div>
+<div id="working-with-datasets" class="section level1" number="6">
+<h1 number="6"><span class="header-section-number">6</span> Working with datasets</h1>
+<p>In this section we’ll start working with data frames. Data frames are the objects that R uses to store datasets for analysis. You can think of a dataframe as a set of vectors all of the same length, with each vector representing a variable. In the Day 2 lecture we will discuss data frames and how to make sure your data can be represented in one or more data frames.</p>
+<div id="worked-example-4.-installing-a-package" class="section level2" number="6.1">
+<h2 number="6.1"><span class="header-section-number">6.1</span> Worked Example 4. Installing a package</h2>
+<p>R is not used for data entry or storage; you are likely to have data stored as an Excel file, a csv file, in a database, or in some other format generated by a device.</p>
+<p>So before we can do any analysis we need to import data. We do this in code like everything else in R.</p>
+<p>Base R (‘base’ R is R as it comes when you first download it) cannot read data from Excel files. But there are several add-on ‘packages’ that <em>can</em> read Excel files (there are packages to read data from most common formats, including Stata, SPSS and GraphPad Prism files!). Currently the best package for reading Excel files is called <code>readxl</code> (there are several others but they do not work as well).</p>
+<p>Packages are collections of functions and datasets related to a specific task. They are most often created by R users for their own use and those that meet certain standards can be shared with the community through the Comprehensive R Archive Network (CRAN) or Bioconductor, which makes it very easy to find and install them. In addition anyone can produce and distribute a package themselves, eg through GitHub.</p>
+<p>Note, while R can read data from text and csv files by itself, the <code>readr</code> package makes this easier. If you want to read data from GraphPad Prims files, there is a package called <code>pzfx</code> for this, and the <code>haven</code> package allows you to read SPSS, Stata and SAS files.</p>
+<p>Here we will import a dataset from Excel using the <code>readxl</code> package.</p>
+<p>First, readxl needs to be installed. You can do this through the tools menu or by typing:</p>
+<pre class="r"><code>install.packages(&quot;readxl&quot;) # notice the quotes here</code></pre>
+<p>The first time you try to install a package, R will ask you where you would like to download packages from. Select any UK CRAN mirror.</p>
+<p>Now the package is installed. We could now access its functions by using the package name and the function name, but its easier to first type:</p>
+<pre class="r"><code>library(readxl) # no quotes this time</code></pre>
+<p>‘library’ makes all of the functions in a package available for use without having to reference the package each time. In R terminology everything in the package has been added to the search path, which is the set of places R will look when we refer to an object or a function.</p>
+<p>Now we have the function <code>read_excel()</code> available, which reads data from an excel file.</p>
+<p>Before we dive in and use it, we need to make sure our data is in a sensible place, and we understand how to use the function. First, save the example data (<code>treedata.xlsx</code>) for this tutorial into a ‘data’ subdirectory of your project.</p>
+<p>Open the dataset in Excel and make sure you understand the data that is there.</p>
+</div>
+<div id="exercise-7.-read-the-help" class="section level2" number="6.2">
+<h2 number="6.2"><span class="header-section-number">6.2</span> Exercise 7. Read the help!</h2>
+<p>We are nearly ready to import some data. But before using a new function its always good to read its documentation.</p>
+<p>R and R packages are not as self-explanatory as other software, and so you should expect to spend a fair amount of time, particularly as you are learning R, reading documentation, vignettes, blogs, etc on what R can do, which packages exist, and how to use them.</p>
+<p><code>read_excel()</code> has a few different options so first we should look at the help file:</p>
+<pre class="r"><code>?read_excel # where does the helpfile appear?</code></pre>
+<p>Most R help files are structured in the same way. They have a ‘Description’ section (what does the function do), a ‘Usage’ section (what is the syntax), an ‘Arguments’ section (detail of what all the options mean), a ‘Value’ section (what do I get when I run this) and some Examples. The examples are usually very helpful.</p>
+<p>Notice that <code>read_excel()</code> can extract data from different sheets and ranges of an Excel workbook, can use or ignore column names, and allows you to specify the type of data (numeric, dates, text etc) if you want to, or leave it to R to guess.</p>
+<p>Many R packages also have vignettes or websites including simpler guides to their use in specific cases. readxl has a website that you might find helpful: <a href="https://readxl.tidyverse.org/" class="uri">https://readxl.tidyverse.org/</a></p>
+</div>
+<div id="citing-r-and-r-packages" class="section level2" number="6.3">
+<h2 number="6.3"><span class="header-section-number">6.3</span> Citing R and R packages</h2>
+<p>It is important to cite R and R packages you use correctly, particularly where the package is essential to make your analysis reproducible. To find out how to cite a package use the <code>citation()</code> function.</p>
+<p>How should you cite the ‘readxl’ package?</p>
+</div>
+<div id="worked-example-5.-loading-data-into-r-part-2-data-frames" class="section level2" number="6.4">
+<h2 number="6.4"><span class="header-section-number">6.4</span> Worked Example 5. Loading data into R part 2: Data frames</h2>
+<p>Now we’ll load the data. We want to use the ‘tree species’ data from the introstat.xlsx spreadsheet. Open the spreadsheet in Excel and find this sheet. The data we want is in the sheet called P1-TreeSpeciesData.</p>
+<p>From the read_excel() help file we can deduce the syntax to load this data into R:</p>
+<pre class="r"><code>TreeData &lt;- read_excel(path=&quot;introstat.xlsx&quot;, sheet=&quot;P1-TreeSpeciesData&quot;)</code></pre>
+<p>(This assumes that the file ‘introstat.xlsx’ is in the current working directory. The current working directory is shown just above the R console window). You can see the files in the current working directory in the ‘Files’ tab on the bottom right of the RStudio window.</p>
+<p>This line calls the <code>read_excel()</code> function, with the arguments ‘path’, ‘sheet’ set. The other arguments will be set to their default values, which you can see from the help file.</p>
+<p>We could have set the range of the data in the spreadsheet (I usually do this for safety), but <code>read_excel()</code> can figure it out automatically most of the time; by default it picks the biggest continuous chunk of data starting in the top left of the sheet.</p>
+<p>Now we have a ‘data frame’ object called TreeData, which includes the data from the Excel sheet ready to process and analyse. It’s a good idea to check that the data has been extracted as you expected, and we can inspect it in various ways. Try:</p>
+<pre class="r"><code>class(TreeData) # what is a &#39;tibble&#39;?</code></pre>
+<pre><code>## [1] &quot;tbl_df&quot;     &quot;tbl&quot;        &quot;data.frame&quot;</code></pre>
+<p>What kind of an object is ‘TreeData’?</p>
+<pre class="r"><code>#See the whole dataset
+TreeData
+
+#This shows you the &#39;dimension&#39; of your data frame (how many rows and columns it has).
+dim(TreeData)</code></pre>
+<pre class="r"><code># This opens a viewing window with your data in the top panel of RStudio.  Useful for small datasets but can crash RStudio with big data.
+View(TreeData)</code></pre>
+<pre class="r"><code># show the first few rows
+head(TreeData)
+
+# compare this to what &#39;summary&#39; did to a vector!
+summary(TreeData)
+
+# get (or set) the names of the columns
+names(TreeData)</code></pre>
+<p><code>summary()</code> shows the name and summary information for each variable (each vector in the data frame), as it did in worked example 2. (You can use <code>summary()</code> on many kinds of R objects, it usually shows you something sensible).</p>
+<p>Finally, clicking on the arrow next to the object name in the Environment window will show you details of each column that the data frame includes.</p>
+<p>Note that the class for each variable is listed by each column name in the Environment window above.</p>
+<p>This is the same output that you would get from the <code>str()</code> function.</p>
+</div>
+<div id="exercise-8.-vectors-and-data-frames" class="section level2" number="6.5">
+<h2 number="6.5"><span class="header-section-number">6.5</span> Exercise 8. Vectors and data frames</h2>
+<ol style="list-style-type: decimal">
+<li>What are the names of the vectors that comprise the TreeData dataframe?</li>
+<li>What is the class of each?</li>
+</ol>
+<p>A corollary of the fact that all elements of a vector must have the same class is that all the values in a single column of a dataset must have the same class. That is, you cannot have a column in your dataset that includes the numeric value <code>3</code> and the character value <code>Green</code>. This information would need to be stored in a different way.</p>
+</div>
+</div>
+<div id="making-summary-statistics" class="section level1" number="7">
+<h1 number="7"><span class="header-section-number">7</span> Making summary statistics</h1>
+<p>A data frame is essentially a set of vectors, all of the same length, that have been stuck together into a rectangle such that each row describes unit of one observation, and each column includes a particular attribute of that observation.</p>
+<p>This ‘tidy’ format is how we <em>must</em> store all our datasets for analysis. If you have used SPSS, Stata or a relational database you will be familiar with this way of organising data. GraphPad Prism works differently, so you will need to change the way you organise data if you move from GraphPad Prism to R.</p>
+<p>See the reference below on ‘tidy data’ for more on how to organise your data into one or more tidy data frames, you may not immediately think this is possible for your dataset, but it is! (and it is essential!)</p>
+<p><a href="https://vita.had.co.nz/papers/tidy-data.pdf" class="uri">https://vita.had.co.nz/papers/tidy-data.pdf</a></p>
+<p>For complex datasets, for example high throughput genomics combined with meta-data, your data might be stored as more than one dataframe, one for the main data and a separate data frame for the meta-data.</p>
+<p>Once we have our data tidied and loaded into a data frame, we can access each variable as a vector and work on it exactly as we did in the section on vectors above.</p>
+<p>We can access the individual vectors using the <code>$</code> accessor operator:</p>
+<pre class="r"><code>TreeData$height</code></pre>
+<pre><code>##   [1]  5.6  5.8  4.9  4.0  5.6  5.3  5.5  6.9  4.8  4.8  4.5  4.9  6.7  7.0  7.7  7.0  5.8  5.4  3.1  3.6  5.8  4.0  3.2  3.2
+##  [25]  3.3  2.1  2.8  8.8  7.3  8.6  3.5  7.8  6.8  7.1  6.8  6.9 12.2 11.9 11.9 11.6 10.7 12.2 11.2 11.7 10.5  3.8  5.0  4.6
+##  [49]  3.7  4.7  4.6  5.3  3.8  3.5  5.5  5.1  4.1  4.0  5.4  5.2  5.5  5.0  4.9  0.7  3.1  1.9  2.9  2.4  3.5  1.6  2.3  3.1
+##  [73]  8.8  5.9  8.5  4.1  8.9  9.1  5.8  8.4  6.4 10.2 10.4  6.2 10.6 10.6 10.8  9.2  8.6  9.8  6.9  5.9  5.7  5.2  5.1  7.2
+##  [97]  4.8  4.9  7.7  7.9  6.8  7.8  6.9  7.6  4.8  6.9  5.5  8.1  4.4  4.6  4.2  2.5  4.9  4.4  2.8  4.5  2.7  9.4 10.0  7.0
+## [121]  8.5  8.6  6.5 11.1 10.2  8.9 14.8 12.4 11.4 14.1 10.0  9.9  9.5 12.6 11.7  4.1  3.8  6.7  6.3  5.5  5.5  5.4  6.1  6.0
+## [145]  6.6  8.1  6.0  6.4  7.7  6.3  6.4  7.9  6.6  5.2  4.9  3.3  4.2  4.1  4.4  4.4  3.5  4.3 11.3  9.2  8.4  9.9  6.2  9.5
+## [169] 10.3  8.8  9.7 10.5 12.8 12.9 11.8 13.5 11.0  9.4 13.0 14.5</code></pre>
+<p>(see <a href="https://www.r-bloggers.com/2009/10/r-accessors-explained/" class="uri">https://www.r-bloggers.com/2009/10/r-accessors-explained/</a> for more details r accessor functions)</p>
+<p>This is just a vector, so we can use any of the functions for vectors to summarise this variable. Try:</p>
+<pre class="r"><code>mean(TreeData$height)</code></pre>
+<pre><code>## [1] 6.877778</code></pre>
+<pre class="r"><code>boxplot(TreeData$height)</code></pre>
+<p><img src="day1_files/figure-html/unnamed-chunk-36-1.png" width="672" /></p>
+<p>This can be a useful way to summarise individual variables, although as a summary table it’s very limited! Often we want to be able to summarise according to the levels of another factor.</p>
+<p>(Here we will just discuss summarising a single variable by a single stratifying variable. In a separate handout I discuss options for creating bigger summary tables of statistics.)</p>
+<p>We will look at how to summarise a continuous variable across groups:</p>
+<div id="a-continuous-variable-stratified-by-a-grouping-variable-and-the-formula-interface" class="section level2" number="7.1">
+<h2 number="7.1"><span class="header-section-number">7.1</span> A continuous variable stratified by a grouping variable, and the formula interface</h2>
+<p>Let’s get the heights by species. We can do this using the ‘aggregate’ function:</p>
+<pre class="r"><code>aggregate( height ~ species.name, FUN=mean, data = TreeData )</code></pre>
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":["species.name"],"name":[1],"type":["chr"],"align":["left"]},{"label":["height"],"name":[2],"type":["dbl"],"align":["right"]}],"data":[{"1":"A. aulococarpa","2":"6.188889"},{"1":"A. polystachya","2":"3.497222"},{"1":"C. cunninghamiana","2":"8.138889"},{"1":"E. pellita","2":"5.283333"},{"1":"M. viridiflora","2":"11.280556"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+<p>Although this is a relatively simple example, there is a lot to unpick in the syntax that is important for understanding how R analysis functions often work.</p>
+<p>Here <code>aggregate()</code> uses the ‘formula’ interface, that is, its first argument is a <em>formula</em> of the form <code>y ~ x</code>. It’s important to understand this now because this is how variables are specified as arguments in many different R functions, eg to run analyses and to make graphics.</p>
+<p>Formulas are generally used in R to specify relationships between variables in a dataset. Different functions use formulas in different ways, but in general the left hand side of a formula represents one or more dependent variables, and the right hand represents variables that act as predictors or grouping variables.</p>
+<p>Look at the help file for <code>aggregate()</code> to understand how the rest of the arguments are specified. Note there is more than one syntax for <code>aggregate()</code> in the help file, since we gave a formula for the first argument R will choose the appropriate version of the function to use.</p>
+<p><code>aggregate()</code> will use the function specified to its <code>FUN</code> argument to summarise the left-hand side variable, stratified by the right hand side variable.</p>
+<p>How did R know where to find the objects ‘height’ and ‘species.name’? The final <code>data</code> argument tells aggregate where to look for the variables that have been specified in the formula. When you use <code>data=</code> like this in an R function it temporarily adds your data frame to the search path, so that R will find the vectors that you named in the formula.</p>
+<p>Note, this way of using <code>data=</code> in a function doesn’t always work, only in those functions that explicitly allow it. So to get the mean heights in this dataset you can’t, for example, use:</p>
+<pre class="r"><code>mean(height, data=TreeData)</code></pre>
+<p>you would instead have to use either of the following:</p>
+<pre class="r"><code>mean(TreeData$height)</code></pre>
+<pre><code>## [1] 6.877778</code></pre>
+<pre class="r"><code>with(TreeData, mean(height)) # look up &#39;with&#39; if you&#39;re interested!</code></pre>
+<pre><code>## [1] 6.877778</code></pre>
+</div>
+<div id="exercise-9.-medians-over-groups" class="section level2" number="7.2">
+<h2 number="7.2"><span class="header-section-number">7.2</span> Exercise 9. Medians over groups</h2>
+<ol style="list-style-type: decimal">
+<li>Use <code>aggregate()</code> to find the median tree height, stratified by tree health.</li>
+<li>Use a more complex forumla to find the median tree height stratified by both health and species.</li>
+</ol>
+</div>
+<div id="tabulating-a-categorical-variable-over-groups" class="section level2" number="7.3">
+<h2 number="7.3"><span class="header-section-number">7.3</span> Tabulating a categorical variable over groups</h2>
+<p>For a categorical variable, a summary of frequency counts might be the most appropriate descriptive statistic. We can get this with the <code>table()</code> function. Suppose we wanted to know the distribution of species in our dataset.</p>
+<pre class="r"><code>table(TreeData$species.name)</code></pre>
+<pre><code>## 
+##    A. aulococarpa    A. polystachya C. cunninghamiana        E. pellita    M. viridiflora 
+##                36                36                36                36                36</code></pre>
+<p>The ‘table’ function can also generate cross-tabs, by specifying two or three variables. Note here how they are defined using the accessor operator. <code>table()</code> does not use the forumula interface we discussed above, although the sister function <code>xtabs()</code> does.</p>
+<pre class="r"><code>table(TreeData$species.name, TreeData$health)</code></pre>
+<pre><code>##                    
+##                      N  Y
+##   A. aulococarpa     7 29
+##   A. polystachya    17 19
+##   C. cunninghamiana  9 27
+##   E. pellita         4 32
+##   M. viridiflora     2 34</code></pre>
+<pre class="r"><code>xtabs(  ~ species.name + health , data=TreeData )</code></pre>
+<pre><code>##                    health
+## species.name         N  Y
+##   A. aulococarpa     7 29
+##   A. polystachya    17 19
+##   C. cunninghamiana  9 27
+##   E. pellita         4 32
+##   M. viridiflora     2 34</code></pre>
+<p>Notice the formula for <code>xtabs()</code> did not need a left hand side variable, both of the grouping factors are entered on the right hand side.</p>
+<p>Tables of counts are useful, but it might be more helpful to see the proportion of healthy trees by species. To get this we can pass the table we just made into the prop.table() function:</p>
+<pre class="r"><code>table1 &lt;- table(TreeData$species.name, TreeData$health)
+prop.table(table1)</code></pre>
+<pre><code>##                    
+##                              N          Y
+##   A. aulococarpa    0.03888889 0.16111111
+##   A. polystachya    0.09444444 0.10555556
+##   C. cunninghamiana 0.05000000 0.15000000
+##   E. pellita        0.02222222 0.17777778
+##   M. viridiflora    0.01111111 0.18888889</code></pre>
+<p>The table above has calculated the ‘cell proportions’. If we want the row percentages we need to set the <code>margin</code> option in <code>prop.table()</code> appropriately. <code>margin=1</code> is the rows, <code>margin=2</code> is the columns. If you left out margins altogether, you’d get the cell proportions.</p>
+<p>We could round this (or any numeric) to 2 d.p. by passing the resulting proportion table into the <code>round()</code> function:</p>
+<pre class="r"><code>proptab1 &lt;- prop.table(table1, margin=1)
+round(proptab1, digits=2)</code></pre>
+<pre><code>##                    
+##                        N    Y
+##   A. aulococarpa    0.19 0.81
+##   A. polystachya    0.47 0.53
+##   C. cunninghamiana 0.25 0.75
+##   E. pellita        0.11 0.89
+##   M. viridiflora    0.06 0.94</code></pre>
+<div id="subsetting-from-tables-and-data-frames" class="section level3" number="7.3.1">
+<h3 number="7.3.1"><span class="header-section-number">7.3.1</span> Subsetting from tables and data frames</h3>
+<p>Remember <code>a[1]</code> from earlier that returned the first element of the vector ‘a’? You can do a similar thing with two-dimensional structures like tables and data frames to return individual elements, rows or columns. For example:</p>
+<pre class="r"><code>proptab1[1,1] # get the element on the first row and first column</code></pre>
+<pre><code>## [1] 0.1944444</code></pre>
+<pre class="r"><code>proptab1[,2] # this returns the second column only.</code></pre>
+<pre><code>##    A. aulococarpa    A. polystachya C. cunninghamiana        E. pellita    M. viridiflora 
+##         0.8055556         0.5277778         0.7500000         0.8888889         0.9444444</code></pre>
+<pre class="r"><code>proptab1[4,] # return the fourth row only</code></pre>
+<pre><code>##         N         Y 
+## 0.1111111 0.8888889</code></pre>
+<p>Try extracting individual elements or rows from <code>TreeData</code>.</p>
+</div>
+</div>
+<div id="exercise-10.-tables-data-frames-and-accessors" class="section level2" number="7.4">
+<h2 number="7.4"><span class="header-section-number">7.4</span> Exercise 10. Tables, data frames and accessors</h2>
+<ol style="list-style-type: decimal">
+<li>What would be an easy way to convert these proportions to percentages?</li>
+<li>Can you use prop.table() to generate column percentages instead of row percentages?</li>
+<li><strong>Difficult!</strong> Create a new data frame corresponding to the rows of TreeData with location equal to 1.</li>
+</ol>
+<p>Further reading on the ‘extract’ operators: <a href="https://github.com/lgreski/datasciencectacontent/blob/master/markdown/rprog-extractOperator.md" class="uri">https://github.com/lgreski/datasciencectacontent/blob/master/markdown/rprog-extractOperator.md</a> <a href="https://www.r-bloggers.com/2009/10/r-accessors-explained/" class="uri">https://www.r-bloggers.com/2009/10/r-accessors-explained/</a></p>
+</div>
+</div>
+<div id="basic-plots-and-hypothesis-tests" class="section level1" number="8">
+<h1 number="8"><span class="header-section-number">8</span> Basic plots and hypothesis tests</h1>
+<div id="worked-example-6.-making-basic-plots" class="section level2" number="8.1">
+<h2 number="8.1"><span class="header-section-number">8.1</span> Worked Example 6. Making basic plots</h2>
+<p>We’ve already seen the box plot in the previous section. We can ask for this in a slightly different way (using the formula interface as above), and stratify it by species:</p>
+<pre class="r"><code>boxplot(height ~ species.name, data=TreeData)</code></pre>
+<p><img src="day1_files/figure-html/unnamed-chunk-45-1.png" width="672" /></p>
+<p>We’ll make many improvements to this box plot when we discuss graphics on Day 3.</p>
+</div>
+<div id="worked-example-7.-hypothesis-tests" class="section level2" number="8.2">
+<h2 number="8.2"><span class="header-section-number">8.2</span> Worked Example 7. Hypothesis tests</h2>
+<p>Is height associated on tree health? We can generate a simple box plot as previously to explore this question:</p>
+<pre class="r"><code>boxplot( height ~ health, data=TreeData , 
+         ylab=&quot;Height&quot;, xlab=&quot;Health&quot;,
+         col=&quot;red&quot;) # Note the use of a multi-line command in a script!</code></pre>
+<p><img src="day1_files/figure-html/unnamed-chunk-46-1.png" width="672" /></p>
+<p>It looks like the two variables might be related, but we would like to perform a t-test to see if the difference is statistically significant, and to get an estimate (with confidence interval) for the difference.</p>
+<p>The syntax for the t-test is almost exactly the same as that used to generate the box plot. We use the same formula <code>height~health</code> to again specify that height depends on health in our analysis:</p>
+<pre class="r"><code>t.test( height ~ health , data=TreeData)</code></pre>
+<pre><code>## 
+##  Welch Two Sample t-test
+## 
+## data:  height by health
+## t = -3.7752, df = 66.076, p-value = 0.0003448
+## alternative hypothesis: true difference in means between group N and group Y is not equal to 0
+## 95 percent confidence interval:
+##  -2.8742163 -0.8857401
+## sample estimates:
+## mean in group N mean in group Y 
+##        5.405128        7.285106</code></pre>
+<p>Note that t.test has returned ‘Welch’s Two Sample t-test’. This is not the traditional t-test with equal variances assumption, by default R runs a t-test that does not assume equal variances across groups. This is probably better, but if you want the traditional test you’ll have to look at the help file to get it.</p>
+<p>In general it’s useful to read the documentation for any new function that you are using, because the default R behaviour might not be what you expect.</p>
+<p>Note: Note from the t.test help file: the default options are shown first, so here <code>var.equal=FALSE</code> is the default which you had to override with <code>var.equal=TRUE</code> in your function call if this is what you want.</p>
+</div>
+<div id="exercise-11.-hypothesis-tests" class="section level2" number="8.3">
+<h2 number="8.3"><span class="header-section-number">8.3</span> Exercise 11. Hypothesis tests</h2>
+<ol style="list-style-type: decimal">
+<li>Run a Mann-Whitney test instead to compare tree heights over health</li>
+<li>Run a Chi-squared test to test whether the proportion of healthy trees varies significantly by species.</li>
+<li><strong>Difficult!</strong> Run a linear regression model to test whether height depends on health controlling for species.</li>
+</ol>
+</div>
+</div>
+<div id="answers-and-comment-on-the-exercises" class="section level1" number="9">
+<h1 number="9"><span class="header-section-number">9</span> <strong>Answers and comment on the exercises</strong></h1>
+<div id="exercise-1" class="section level3" number="9.0.1">
+<h3 number="9.0.1"><span class="header-section-number">9.0.1</span> Exercise 1</h3>
+<p><code>log(10)</code></p>
+<p><code>sqrt(2)</code></p>
+<p><code>10^(1/3)</code></p>
+</div>
+<div id="exercise-2" class="section level3" number="9.0.2">
+<h3 number="9.0.2"><span class="header-section-number">9.0.2</span> Exercise 2</h3>
+<ol style="list-style-type: decimal">
+<li>Type <code>y = x+3</code> or <code>y &lt;- x+3</code>, then <code>y</code> to print its value.</li>
+<li>Subsequently changing x doesn’t change the value of y. When y was created it used only the value of x at that time, and changing x afterwards doesn’t change y.</li>
+<li><code>myname</code> is a character object.</li>
+<li>Use <code>toupper(myname)</code></li>
+</ol>
+</div>
+<div id="exercise-3" class="section level3" number="9.0.3">
+<h3 number="9.0.3"><span class="header-section-number">9.0.3</span> Exercise 3</h3>
+<ol style="list-style-type: decimal">
+<li><code>as.numeric(TRUE)</code> evaluates to 1. <code>as.numeric(FALSE)</code> evaluates to 0.</li>
+<li>Character strings convert to <code>NA</code> (missing) if they are not simple numbers.</li>
+</ol>
+</div>
+<div id="exercise-4" class="section level3" number="9.0.4">
+<h3 number="9.0.4"><span class="header-section-number">9.0.4</span> Exercise 4</h3>
+<ol style="list-style-type: decimal">
+<li>A vector can be a vector of characters</li>
+<li>Since all the elements of a vector need to be the same type, the numeric <code>3</code> gets converted to a character <code>"3"</code> when it is combined with a character. The result is a character vector.</li>
+<li>Similarly, <code>TRUE</code> gets coverted to <code>1</code> to make a numeric vector.</li>
+<li>This returns the mean of the vector. We didn’t have to make the vector object first, we can chain functions together by using one as the argument to another.</li>
+<li>The <code>%in%</code> operator returns true if the left hand side is equal to any of the elements of the vector on the right hand side.</li>
+<li>This tests whether each element of <code>vectorB</code> is equal to <code>"George"</code>.</li>
+<li><code>vectorb</code> is a character, and we can’t take its mean. This throws an error.</li>
+</ol>
+</div>
+<div id="exercise-5" class="section level3" number="9.0.5">
+<h3 number="9.0.5"><span class="header-section-number">9.0.5</span> Exercise 5</h3>
+<ol style="list-style-type: decimal">
+<li><code>class()</code> is not affected by missing values in the vector</li>
+<li>there is no point for the missing value, but a space where it would have been.</li>
+<li>a comparison with <code>NA</code> returns <code>NA</code>.</li>
+<li>tests each element of a vector to see if it is missing</li>
+<li><dl>
+<dt>since <code>is.na()</code> returns a vector of logicals, this function sums the logicals corresponding to whether each element of the vector is missing or not. From the exercise above we know that <code>TRUE</code> equates to 1 and <code>FALSE</code> to 0, so this expression effectively counts the number of missing values in a vector.</dt>
+<dd>No clues with this one, but the final answer should be 1.
+</dd>
+</dl></li>
+</ol>
+</div>
+<div id="exercise-6" class="section level3" number="9.0.6">
+<h3 number="9.0.6"><span class="header-section-number">9.0.6</span> Exercise 6</h3>
+<ol style="list-style-type: decimal">
+<li><code>sd(a)</code></li>
+<li><code>hist(b)</code></li>
+<li><code>a &lt;- rnorm(100,0,1)</code> (or just <code>rnorm(100)</code> will also do)</li>
+<li><code>hist(a[a&gt;0])</code></li>
+</ol>
+</div>
+<div id="exercise-8" class="section level3" number="9.0.7">
+<h3 number="9.0.7"><span class="header-section-number">9.0.7</span> Exercise 8</h3>
+<ol style="list-style-type: decimal">
+<li>You can use <code>names(TreeData)</code> to get this.</li>
+<li>Get this from <code>str(TreeData)</code> or <code>lapply(TreeData, class)</code></li>
+</ol>
+</div>
+<div id="exercise-9" class="section level3" number="9.0.8">
+<h3 number="9.0.8"><span class="header-section-number">9.0.8</span> Exercise 9</h3>
+<ol style="list-style-type: decimal">
+<li><code>aggregate(height ~ health, FUN=median, data=TreeData)</code></li>
+<li><code>aggregate(height ~ health + species.name, FUN=median, data=TreeData)</code></li>
+<li><code>TreeData2 &lt;- TreeData[ TreeData$location==1 , ]</code> or <code>TreeData2 &lt;- subset(TreeData, location==1)</code></li>
+</ol>
+</div>
+<div id="exercise-10" class="section level3" number="9.0.9">
+<h3 number="9.0.9"><span class="header-section-number">9.0.9</span> Exercise 10</h3>
+<ol style="list-style-type: decimal">
+<li>You could multiply the table of proportions by 100, either before or after you round it to 2 d.p. Compare:</li>
+</ol>
+<p><code>100*round(proptab1, digits=2)</code></p>
+<p><code>round(100*proptab1, digits=2)</code></p>
+</div>
+<div id="exercise-11" class="section level3" number="9.0.10">
+<h3 number="9.0.10"><span class="header-section-number">9.0.10</span> Exercise 11</h3>
+<ol style="list-style-type: decimal">
+<li><p><code>t.test( height ~ health , data=TreeData)</code></p></li>
+<li><p>You would use <code>chisq.test</code>, either passing the variables directly:</p>
+<p><code>chisq.test(TreeData$health, TreeData$species)</code></p>
+<p>or by using one of the cross-tabs we already generated.</p></li>
+<li><p>A linear regression model can be estimated using <code>lm</code> as follows:</p></li>
+</ol>
+<pre class="r"><code>lm( height ~ health + species.name , data=TreeData)</code></pre>
+<p>but to read the output we need to run <code>summary</code> on the <code>lm</code> object that is created by the <code>lm</code> function:</p>
+<pre class="r"><code>myModel &lt;- lm( height ~ health + species.name , data=TreeData)
+class(myModel)
+summary(myModel)</code></pre>
+</div>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

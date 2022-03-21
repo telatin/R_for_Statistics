@@ -1,0 +1,3396 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="George Savva" />
+
+
+<title>Day 2: Tidy data and regression models</title>
+
+<script src="site_libs/header-attrs-2.10/header-attrs.js"></script>
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.tab('show');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">R for Statistics</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">
+    <span class="fa fa-home"></span>
+     
+    Home
+  </a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Intro to R for Statistics
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="day1.html">Part 1</a>
+    </li>
+    <li>
+      <a href="day2.html">Part 2</a>
+    </li>
+    <li>
+      <a href="workshopscript.html">JIC MSc Workshop</a>
+    </li>
+    <li>
+      <a href="flipbook.html">ggplot example</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Statistics notes
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="dichot.html">Don't group your data points</a>
+    </li>
+  </ul>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="mailto:george.savva@quadram.ac.uk">
+    <span class="fa fa-envelope-o"></span>
+     
+    Contact me
+  </a>
+</li>
+<li>
+  <a href="https://github.com/georgemsavva">
+    <span class="fa fa-github"></span>
+     
+    GitHub
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">Day 2: Tidy data and regression models</h1>
+<h4 class="author">George Savva</h4>
+<h4 class="date">March 2022</h4>
+
+</div>
+
+
+<div id="day-2-introduction" class="section level1" number="1">
+<h1 number="1"><span class="header-section-number">1</span> Day 2 Introduction</h1>
+<p>On day 1 we saw the basics of how R works, and introduced some basic tests and descriptive statistics.</p>
+<p>In this session we will get more practical, dealing with real datasets, estimating and reporting linear models.</p>
+<p>Specific learning objectives are</p>
+<ol style="list-style-type: decimal">
+<li>Tidy data</li>
+<li>Data wrangling</li>
+<li>Estimating and diagnosing a linear model</li>
+</ol>
+</div>
+<div id="stroke-rehabilitation-study" class="section level1" number="2">
+<h1 number="2"><span class="header-section-number">2</span> Stroke rehabilitation study</h1>
+<p>In this tutorial we will use linear models in R to answer some research questions arising from a clinical study.</p>
+<p>The data are from a randomised clinical trial of a new rehabilition intervention (compared to standard post-stroke care) aimed at improving the walking speed of hospital patients. Better walking speed is a good indicator of general stroke recovery.</p>
+<p>We have recorded:</p>
+<ul>
+<li>the age and sex of each participant,</li>
+<li>the treatment allocation,</li>
+<li>the hospital department from which they were recruited and</li>
+<li>time they take to complete a walking task.</li>
+</ul>
+<p>Our research questions are:</p>
+<ol style="list-style-type: decimal">
+<li>What are the mean and standard deviation of walking speed for treated and untreated participants?</li>
+<li>Does the treatment improve walking speed compared to controls?</li>
+<li>By how much, and how certain are we of this?</li>
+<li>Do age and sex affect walking speed?</li>
+<li>Does sex affect the success of the treatment?</li>
+<li>Was there any difference in treatment effect by department?</li>
+</ol>
+<div id="installing-the-packages-we-will-need" class="section level2" number="2.1">
+<h2 number="2.1"><span class="header-section-number">2.1</span> Installing the packages we will need</h2>
+<p>Today we will use the <code>readxl</code>, <code>tidyr</code>, <code>gtsummary</code>, and <code>emmeans</code> packages. Make sure you have these installed.</p>
+<pre class="r"><code>install.packages(&quot;readxl&quot;)
+install.packages(&quot;dplyr&quot;)
+install.packages(&quot;emmeans&quot;)
+install.packages(&quot;gtsummary&quot;)</code></pre>
+</div>
+<div id="loading-and-exploring-the-data" class="section level2" number="2.2">
+<h2 number="2.2"><span class="header-section-number">2.2</span> Loading and exploring the data</h2>
+<p>First we should inspect the data that we have. It has been supplied to us as an Excel sheet <code>walkingspeed.xlsx</code>. There are three sheets that include the data that we need for our analysis. <code>treated</code> includes outcomes from treated participants, <code>control</code> includes the outcome from control participants, while <code>meta</code> includes the demographic meta data from all participants.</p>
+<p>We will need to organise this data into a form in which it can be analysed (ie a ‘tidy’ format).</p>
+</div>
+<div id="exercise-1.-tidy-data" class="section level2" number="2.3">
+<h2 number="2.3"><span class="header-section-number">2.3</span> Exercise 1. Tidy data</h2>
+<ol style="list-style-type: decimal">
+<li>Discuss - How should the walking speed data look in a ‘tidy’ layout?</li>
+</ol>
+</div>
+</div>
+<div id="making-the-data-tidy-in-r" class="section level1" number="3">
+<h1 number="3"><span class="header-section-number">3</span> Making the data ‘tidy’ in R</h1>
+<p>In this simple case we <em>might</em> find it easier to create our dataset in the right format before we import it into R.</p>
+<p>But for more complex or larger datasets, or if we might have to repeat this operation with a new dataset, it would be better to all of our ‘data wrangling’ using R code.</p>
+<p>We have our data in three separate sheets, and we need to end up with a single data frame that allows us to answer our questions by expressing relationships using the formula syntax.</p>
+<p>That is, we will ultimately want to be able to say something like:</p>
+<p><code>speed ~ treatment + age + sex + department</code></p>
+<p>so we need to set up our dataset to facilitate this.</p>
+<p>We will need to append the treated to the control datasets, and then merge in the meta-data.</p>
+<div id="step-1.-appending-datasets" class="section level2" number="3.1">
+<h2 number="3.1"><span class="header-section-number">3.1</span> Step 1. Appending datasets</h2>
+<p>Base R has the function <code>rbind()</code> to combine dataframes row-wise into a new longer dataframe. But as with many ‘data wrangling’ problems, the tidyverse function <code>bind_rows()</code>is better. Note - for those who want to use the <code>data.table</code> package, the function <code>rbindlist()</code> is an excellent alternative.</p>
+<p>Tidyverse is made of lots of different packages, we have already seen <code>readxl</code> in day 1, today we will use a function from the <code>dplyr</code> package.</p>
+</div>
+<div id="worked-example-1.-using-bind_rows" class="section level2" number="3.2">
+<h2 number="3.2"><span class="header-section-number">3.2</span> Worked Example 1. Using bind_rows()</h2>
+<ol style="list-style-type: decimal">
+<li>Check whether you have <code>dplyr</code> already installed, and install it if you do not.</li>
+<li>Start a new script for todays exercise.</li>
+<li>Load the <code>dplyr</code> library, and look at the help for <code>bind_rows()</code></li>
+</ol>
+<p>Load the control and treatment data into R from the Excel sheet.</p>
+<pre class="r"><code>library(readxl) 
+treated &lt;- read_excel(path=&quot;walkingspeed.xlsx&quot;, sheet=&quot;treated&quot;)
+control &lt;- read_excel(path=&quot;walkingspeed.xlsx&quot;, sheet=&quot;control&quot;)</code></pre>
+</div>
+<div id="exercise-2.-type-trouble" class="section level2" number="3.3">
+<h2 number="3.3"><span class="header-section-number">3.3</span> Exercise 2. Type trouble</h2>
+<ol style="list-style-type: decimal">
+<li>What are the names and classes of each of the vectors in the <code>treated</code> and <code>control</code> data frames.<br />
+</li>
+<li>Are they the same? If not, why not?<br />
+</li>
+<li>Is this a problem? How should we fix it?</li>
+</ol>
+<p>Now if we use <code>bind_rows()</code> on these datasets, we see the following:</p>
+<pre class="r"><code>library(dplyr) 
+combined &lt;- bind_rows(treated, control)
+head(combined)</code></pre>
+<pre><code>## # A tibble: 6 x 3
+##   patid time               walktime
+##   &lt;dbl&gt; &lt;chr&gt;                 &lt;dbl&gt;
+## 1     1 1.8975120000000001       NA
+## 2     3 2.927432                 NA
+## 3     5 2.2042579999999998       NA
+## 4     7 2.1441910000000002       NA
+## 5     9 1.7203250000000001       NA
+## 6    11 2.1476410000000001       NA</code></pre>
+<p>We have two different columns for time! This is because <code>bind_rows</code> tries to match the columns by name, and the <code>time</code> columns had different names in our dataset. So we need to fix the names in our data frames to be the same before we bind them:</p>
+<p>We can get or set the column names of a data frame with the <code>names()</code> function.</p>
+<p>So here we will use:</p>
+<pre class="r"><code>names(control) &lt;- names(treated) # can you explain what this does?</code></pre>
+<p>Now what happens if you try to bind the rows?</p>
+<pre class="r"><code>combined &lt;- bind_rows(treated, control) # can you explain what this does?</code></pre>
+<pre><code>## Error: Can&#39;t combine `..1$time` &lt;character&gt; and `..2$time` &lt;double&gt;.</code></pre>
+<p>If you didn’t fix the type of the walking earlier, <code>bind_rows()</code> will fail because in one dataset <code>time</code> is a character vector, and in the other it is a numeric vector.</p>
+<p>Since we are going to be doing a statistical analysis on this variable, we need it to be a numeric. Recall that we can convert a character to a numeric with <code>as.numeric()</code></p>
+<p>The same function will work for a vector that is part of a dataframe:</p>
+<pre class="r"><code>treated$time &lt;- as.numeric(treated$time)</code></pre>
+<pre><code>## Warning: NAs introduced by coercion</code></pre>
+<p>Note the warning here, R is telling us that there was a non-numeric character, and that it has been converted to missing. We should check the original data to see if this is acceptable to us.</p>
+<p><em>Question - how might you find out using R code which observation is has a time that could not be converted to numeric?</em></p>
+<p>Now we can bind the rows of the dataset together:</p>
+<pre class="r"><code>combined &lt;- bind_rows(treated, control)
+head(combined)</code></pre>
+<pre><code>## # A tibble: 6 x 2
+##   patid  time
+##   &lt;dbl&gt; &lt;dbl&gt;
+## 1     1  1.90
+## 2     3  2.93
+## 3     5  2.20
+## 4     7  2.14
+## 5     9  1.72
+## 6    11  2.15</code></pre>
+<p>This is fine, but now we don’t know which data point came from which group. Fortunately, <code>bind_rows()</code> has another argument that adds a column to the new dataset indicating which row it came from.</p>
+</div>
+<div id="exercise-3.-adding-an-group-column" class="section level2" number="3.4">
+<h2 number="3.4"><span class="header-section-number">3.4</span> Exercise 3. Adding an group column</h2>
+<ol style="list-style-type: decimal">
+<li>Check the help for <code>bind_rows()</code> to find out how to add the grouping column.</li>
+<li>Try it! Call the new column <code>group</code>.</li>
+</ol>
+</div>
+</div>
+<div id="merging-datasets" class="section level1" number="4">
+<h1 number="4"><span class="header-section-number">4</span> Merging datasets</h1>
+<p>So now we have a combined dataset including all of our outcome data and a grouping variable.</p>
+<p>To complete our data wrangling we need the patient meta-data to also be included in this data frame. Since the data are linked by an ID variable, we will use the <code>merge()</code> function to add this information:</p>
+<p>First, we’ll read the meta-data into a new data frame.<br />
+Then we’ll merge the two together using the <code>merge()</code> function. <code>by.x</code> and <code>by.y</code> tell <code>merge()</code> which variables are the ID variables in the first and second datasets respectively. I hope this is clear, check the documentation if it is not!</p>
+<pre class="r"><code>meta &lt;- read_excel(path=&quot;walkingspeed.xlsx&quot;, sheet=&quot;meta&quot;)
+head(meta)</code></pre>
+<pre><code>## # A tibble: 6 x 4
+##   patient sex     age department
+##     &lt;dbl&gt; &lt;chr&gt; &lt;dbl&gt;      &lt;dbl&gt;
+## 1       1 M        53          3
+## 2       2 M        61          3
+## 3       3 M        65          1
+## 4       4 M        48          2
+## 5       5 M        62          2
+## 6       6 M        62          4</code></pre>
+<pre class="r"><code>head(combined)</code></pre>
+<pre><code>## # A tibble: 6 x 3
+##   group patid  time
+##   &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt;
+## 1 treat     1  1.90
+## 2 treat     3  2.93
+## 3 treat     5  2.20
+## 4 treat     7  2.14
+## 5 treat     9  1.72
+## 6 treat    11  2.15</code></pre>
+<pre class="r"><code>walkingdat &lt;- merge(combined, meta, by.x = &quot;patid&quot;, by.y = &quot;patient&quot;)
+head(walkingdat)</code></pre>
+<pre><code>##   patid   group     time sex age department
+## 1     1   treat 1.897512   M  53          3
+## 2     2 control 3.537158   M  61          3
+## 3     3   treat 2.927432   M  65          1
+## 4     4 control 1.819787   M  48          2
+## 5     5   treat 2.204258   M  62          2
+## 6     6 control 3.038065   M  62          4</code></pre>
+<p>So now we have a single dataframe in tidy format with everything we need to conduct our analysis!</p>
+<p>Note that each row contains everything we need to know about each unit of observation, and each column corresponds to a specific variable.</p>
+<p>This kind of data wrangling is fairly typical of the process I need to go through when I get a new dataset before I can start working on it.</p>
+<p>Be prepared to spend some time figuring out how to do this with your data, and learning the relevant functions from the <code>dplry</code>, <code>tidyr</code> and other <code>tidyverse</code> or <code>data.table</code> libraries.</p>
+<p>Also, when you are designing your data collection process be aware of how your data ultimately needs to be used, and design your spreadsheets or other data entry systems accordingly. If you use a database rather than a spreadsheet this will help.</p>
+</div>
+<div id="exploratory-analysis" class="section level1" number="5">
+<h1 number="5"><span class="header-section-number">5</span> Exploratory analysis</h1>
+<p>If you didn’t manage to create a walkingdat dataset in the section above, you can load a ready-made copy from the Excel sheet:</p>
+<pre class="r"><code>walkingdat &lt;- readxl::read_excel(&quot;walkingspeed.xlsx&quot;, sheet=&quot;fixed&quot;)</code></pre>
+<p>Now we have our data in R, the first thing we should do is an exploratory analysis. The aims here are to:</p>
+<ol style="list-style-type: decimal">
+<li>Check that the data all looks OK</li>
+<li>Think about how our statistical analysis might work.</li>
+</ol>
+<p>The main tools we have for exploratory analysis are graphs and descriptive statistics. We should also consider the pattern of missing data to see if this tells us anything important.</p>
+<p>For my exploratory plots I’ll use base <code>R</code> graphics. Later when we are making our report graphics we’ll use <code>ggplot</code>.</p>
+<p>For a first plot, seeing all the data points is important:</p>
+<pre class="r"><code>plot(time~age, data=walkingdat)</code></pre>
+<p><img src="day2_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
+<pre class="r"><code>boxplot(time~sex, data=walkingdat)</code></pre>
+<p><img src="day2_files/figure-html/unnamed-chunk-12-2.png" width="672" /></p>
+<p>What do we learn from these plots?</p>
+<p>Does the big outlier look reasonable (given what we know about the experiment?)</p>
+<p>What are our options for dealing with it?</p>
+</div>
+<div id="outliers-and-transformations" class="section level1" number="6">
+<h1 number="6"><span class="header-section-number">6</span> Outliers and transformations</h1>
+<p>A transformation is often a good option for dealing with outliers or non-normal distributions.</p>
+<pre class="r"><code>plot(time~age, log=&quot;y&quot;,data=walkingdat)</code></pre>
+<p><img src="day2_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
+<p>Now we can see an unreasonably high value, and an unreasonably low one! We also see that the data is likely to be normally distributed (or close enough) on a logarithmic scale.</p>
+<p>Let’s get rid of the outliers, as we believe they are unreasonable. It’s a judgement call but I think I would only remove the highest and the lowest value here, the others look OK.</p>
+<p>To remove the outliers, I will set the value to <code>NA</code> if they are higher or lower than a certain threshold.</p>
+<pre class="r"><code>walkingdat$time[walkingdat$time&gt;100] &lt;- NA
+walkingdat$time[walkingdat$time&lt;.1] &lt;- NA
+
+plot(time~age, log=&quot;y&quot;,data=walkingdat)</code></pre>
+<p><img src="day2_files/figure-html/unnamed-chunk-14-1.png" width="672" /></p>
+<pre class="r"><code>boxplot(time~group, data=walkingdat, log=&quot;y&quot;)</code></pre>
+<p><img src="day2_files/figure-html/unnamed-chunk-14-2.png" width="672" /></p>
+<p>That looks much better.</p>
+</div>
+<div id="descriptive-statistics" class="section level1" number="7">
+<h1 number="7"><span class="header-section-number">7</span> Descriptive statistics</h1>
+<p>Our first question concerned descriptive statistics around walking time amongst men and women.</p>
+<p>We saw in the last session that R does not have a good built in way to make nice descriptive tables. In the last session we saw the <code>table1</code> package but now we can use the new <code>tbl_summary()</code> function from the gtsummary package to get these.</p>
+<pre class="r"><code>library(gtsummary)
+walkingdat &lt;- walkingdat
+tbl_summary(walkingdat)</code></pre>
+<div id="iagbkrzsty" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>html {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+}
+
+#iagbkrzsty .gt_table {
+  display: table;
+  border-collapse: collapse;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#iagbkrzsty .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#iagbkrzsty .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#iagbkrzsty .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 0;
+  padding-bottom: 6px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#iagbkrzsty .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#iagbkrzsty .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#iagbkrzsty .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#iagbkrzsty .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#iagbkrzsty .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#iagbkrzsty .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#iagbkrzsty .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#iagbkrzsty .gt_group_heading {
+  padding: 8px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#iagbkrzsty .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#iagbkrzsty .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#iagbkrzsty .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#iagbkrzsty .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#iagbkrzsty .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 12px;
+}
+
+#iagbkrzsty .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#iagbkrzsty .gt_first_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+}
+
+#iagbkrzsty .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#iagbkrzsty .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#iagbkrzsty .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#iagbkrzsty .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#iagbkrzsty .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#iagbkrzsty .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding: 4px;
+}
+
+#iagbkrzsty .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#iagbkrzsty .gt_sourcenote {
+  font-size: 90%;
+  padding: 4px;
+}
+
+#iagbkrzsty .gt_left {
+  text-align: left;
+}
+
+#iagbkrzsty .gt_center {
+  text-align: center;
+}
+
+#iagbkrzsty .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#iagbkrzsty .gt_font_normal {
+  font-weight: normal;
+}
+
+#iagbkrzsty .gt_font_bold {
+  font-weight: bold;
+}
+
+#iagbkrzsty .gt_font_italic {
+  font-style: italic;
+}
+
+#iagbkrzsty .gt_super {
+  font-size: 65%;
+}
+
+#iagbkrzsty .gt_footnote_marks {
+  font-style: italic;
+  font-weight: normal;
+  font-size: 65%;
+}
+</style>
+<table class="gt_table">
+  
+  <thead class="gt_col_headings">
+    <tr>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1"><strong>Characteristic</strong></th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1"><strong>N = 136</strong><sup class="gt_footnote_marks">1</sup></th>
+    </tr>
+  </thead>
+  <tbody class="gt_table_body">
+    <tr><td class="gt_row gt_left">patid</td>
+<td class="gt_row gt_center">68 (35, 102)</td></tr>
+    <tr><td class="gt_row gt_left">group</td>
+<td class="gt_row gt_center"></td></tr>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">control</td>
+<td class="gt_row gt_center">69 (51%)</td></tr>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">treat</td>
+<td class="gt_row gt_center">67 (49%)</td></tr>
+    <tr><td class="gt_row gt_left">time</td>
+<td class="gt_row gt_center">2.43 (2.17, 2.94)</td></tr>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Unknown</td>
+<td class="gt_row gt_center">3</td></tr>
+    <tr><td class="gt_row gt_left">sex</td>
+<td class="gt_row gt_center"></td></tr>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">F</td>
+<td class="gt_row gt_center">36 (26%)</td></tr>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">M</td>
+<td class="gt_row gt_center">100 (74%)</td></tr>
+    <tr><td class="gt_row gt_left">age</td>
+<td class="gt_row gt_center">57.0 (54.0, 60.2)</td></tr>
+    <tr><td class="gt_row gt_left">department</td>
+<td class="gt_row gt_center"></td></tr>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">1</td>
+<td class="gt_row gt_center">29 (21%)</td></tr>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">2</td>
+<td class="gt_row gt_center">31 (23%)</td></tr>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">3</td>
+<td class="gt_row gt_center">42 (31%)</td></tr>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">4</td>
+<td class="gt_row gt_center">34 (25%)</td></tr>
+  </tbody>
+  
+  <tfoot>
+    <tr class="gt_footnotes">
+      <td colspan="2">
+        <p class="gt_footnote">
+          <sup class="gt_footnote_marks">
+            <em>1</em>
+          </sup>
+           
+          Median (IQR); n (%)
+          <br />
+        </p>
+      </td>
+    </tr>
+  </tfoot>
+</table>
+</div>
+<p>This is really nice!. Something to note: <code>tbl_summary</code> has detected that ‘department’ has only four values so has treated it as a categorical variable. This is fine but in general R functions will not do this (as we will see later) so be careful.</p>
+<p>We want our data stratified by treatment group, so we can use:</p>
+<pre class="r"><code>tbl_summary(walkingdat, by=group)</code></pre>
+<div id="iwrijcshnf" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>html {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+}
+
+#iwrijcshnf .gt_table {
+  display: table;
+  border-collapse: collapse;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#iwrijcshnf .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#iwrijcshnf .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#iwrijcshnf .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 0;
+  padding-bottom: 6px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#iwrijcshnf .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#iwrijcshnf .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#iwrijcshnf .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#iwrijcshnf .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#iwrijcshnf .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#iwrijcshnf .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#iwrijcshnf .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#iwrijcshnf .gt_group_heading {
+  padding: 8px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#iwrijcshnf .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#iwrijcshnf .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#iwrijcshnf .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#iwrijcshnf .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#iwrijcshnf .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 12px;
+}
+
+#iwrijcshnf .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#iwrijcshnf .gt_first_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+}
+
+#iwrijcshnf .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#iwrijcshnf .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#iwrijcshnf .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#iwrijcshnf .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#iwrijcshnf .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#iwrijcshnf .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding: 4px;
+}
+
+#iwrijcshnf .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#iwrijcshnf .gt_sourcenote {
+  font-size: 90%;
+  padding: 4px;
+}
+
+#iwrijcshnf .gt_left {
+  text-align: left;
+}
+
+#iwrijcshnf .gt_center {
+  text-align: center;
+}
+
+#iwrijcshnf .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#iwrijcshnf .gt_font_normal {
+  font-weight: normal;
+}
+
+#iwrijcshnf .gt_font_bold {
+  font-weight: bold;
+}
+
+#iwrijcshnf .gt_font_italic {
+  font-style: italic;
+}
+
+#iwrijcshnf .gt_super {
+  font-size: 65%;
+}
+
+#iwrijcshnf .gt_footnote_marks {
+  font-style: italic;
+  font-weight: normal;
+  font-size: 65%;
+}
+</style>
+<table class="gt_table">
+  
+  <thead class="gt_col_headings">
+    <tr>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1"><strong>Characteristic</strong></th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1"><strong>control</strong>, N = 69<sup class="gt_footnote_marks">1</sup></th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1"><strong>treat</strong>, N = 67<sup class="gt_footnote_marks">1</sup></th>
+    </tr>
+  </thead>
+  <tbody class="gt_table_body">
+    <tr><td class="gt_row gt_left">patid</td>
+<td class="gt_row gt_center">70 (36, 104)</td>
+<td class="gt_row gt_center">67 (34, 100)</td></tr>
+    <tr><td class="gt_row gt_left">time</td>
+<td class="gt_row gt_center">2.69 (2.34, 3.34)</td>
+<td class="gt_row gt_center">2.32 (1.94, 2.63)</td></tr>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Unknown</td>
+<td class="gt_row gt_center">2</td>
+<td class="gt_row gt_center">1</td></tr>
+    <tr><td class="gt_row gt_left">sex</td>
+<td class="gt_row gt_center"></td>
+<td class="gt_row gt_center"></td></tr>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">F</td>
+<td class="gt_row gt_center">19 (28%)</td>
+<td class="gt_row gt_center">17 (25%)</td></tr>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">M</td>
+<td class="gt_row gt_center">50 (72%)</td>
+<td class="gt_row gt_center">50 (75%)</td></tr>
+    <tr><td class="gt_row gt_left">age</td>
+<td class="gt_row gt_center">57.0 (54.0, 59.0)</td>
+<td class="gt_row gt_center">57.0 (54.0, 61.5)</td></tr>
+    <tr><td class="gt_row gt_left">department</td>
+<td class="gt_row gt_center"></td>
+<td class="gt_row gt_center"></td></tr>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">1</td>
+<td class="gt_row gt_center">16 (23%)</td>
+<td class="gt_row gt_center">13 (19%)</td></tr>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">2</td>
+<td class="gt_row gt_center">16 (23%)</td>
+<td class="gt_row gt_center">15 (22%)</td></tr>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">3</td>
+<td class="gt_row gt_center">17 (25%)</td>
+<td class="gt_row gt_center">25 (37%)</td></tr>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">4</td>
+<td class="gt_row gt_center">20 (29%)</td>
+<td class="gt_row gt_center">14 (21%)</td></tr>
+  </tbody>
+  
+  <tfoot>
+    <tr class="gt_footnotes">
+      <td colspan="3">
+        <p class="gt_footnote">
+          <sup class="gt_footnote_marks">
+            <em>1</em>
+          </sup>
+           
+          Median (IQR); n (%)
+          <br />
+        </p>
+      </td>
+    </tr>
+  </tfoot>
+</table>
+</div>
+<p>We won’t spend a lot of time on this table, but lets change the statistics displayed, and some of the row names, and drop the rows we don’t want to include.</p>
+<p>For more customisations see the <code>tbl_summary</code> vignette.</p>
+<p>Take some time to study the <code>tbl_summary</code> command below, the <code>tbl_summary</code> help files and vignettes to understand how these are specified:</p>
+<pre class="r"><code>tbl1 &lt;- tbl_summary(walkingdat[,c(&quot;group&quot;,&quot;time&quot;,&quot;age&quot;, &quot;sex&quot;)], 
+                    by=group,
+                    label=list(time  ~ &quot;Time (s)&quot;, age ~ &quot;Age (yrs)&quot;, sex~&quot;Sex&quot;),
+                    statistic=list(time~&quot;{mean} ({sd})&quot;))
+add_overall(tbl1)</code></pre>
+<div id="clnolifgou" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>html {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+}
+
+#clnolifgou .gt_table {
+  display: table;
+  border-collapse: collapse;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#clnolifgou .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#clnolifgou .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#clnolifgou .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 0;
+  padding-bottom: 6px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#clnolifgou .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#clnolifgou .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#clnolifgou .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#clnolifgou .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#clnolifgou .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#clnolifgou .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#clnolifgou .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#clnolifgou .gt_group_heading {
+  padding: 8px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#clnolifgou .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#clnolifgou .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#clnolifgou .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#clnolifgou .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#clnolifgou .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 12px;
+}
+
+#clnolifgou .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#clnolifgou .gt_first_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+}
+
+#clnolifgou .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#clnolifgou .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#clnolifgou .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#clnolifgou .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#clnolifgou .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#clnolifgou .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding: 4px;
+}
+
+#clnolifgou .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#clnolifgou .gt_sourcenote {
+  font-size: 90%;
+  padding: 4px;
+}
+
+#clnolifgou .gt_left {
+  text-align: left;
+}
+
+#clnolifgou .gt_center {
+  text-align: center;
+}
+
+#clnolifgou .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#clnolifgou .gt_font_normal {
+  font-weight: normal;
+}
+
+#clnolifgou .gt_font_bold {
+  font-weight: bold;
+}
+
+#clnolifgou .gt_font_italic {
+  font-style: italic;
+}
+
+#clnolifgou .gt_super {
+  font-size: 65%;
+}
+
+#clnolifgou .gt_footnote_marks {
+  font-style: italic;
+  font-weight: normal;
+  font-size: 65%;
+}
+</style>
+<table class="gt_table">
+  
+  <thead class="gt_col_headings">
+    <tr>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1"><strong>Characteristic</strong></th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1"><strong>Overall</strong>, N = 136<sup class="gt_footnote_marks">1</sup></th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1"><strong>control</strong>, N = 69<sup class="gt_footnote_marks">1</sup></th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1"><strong>treat</strong>, N = 67<sup class="gt_footnote_marks">1</sup></th>
+    </tr>
+  </thead>
+  <tbody class="gt_table_body">
+    <tr><td class="gt_row gt_left">Time (s)</td>
+<td class="gt_row gt_center">2.86 (1.86)</td>
+<td class="gt_row gt_center">3.12 (1.68)</td>
+<td class="gt_row gt_center">2.61 (2.00)</td></tr>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">Unknown</td>
+<td class="gt_row gt_center">3</td>
+<td class="gt_row gt_center">2</td>
+<td class="gt_row gt_center">1</td></tr>
+    <tr><td class="gt_row gt_left">Age (yrs)</td>
+<td class="gt_row gt_center">57.0 (54.0, 60.2)</td>
+<td class="gt_row gt_center">57.0 (54.0, 59.0)</td>
+<td class="gt_row gt_center">57.0 (54.0, 61.5)</td></tr>
+    <tr><td class="gt_row gt_left">Sex</td>
+<td class="gt_row gt_center"></td>
+<td class="gt_row gt_center"></td>
+<td class="gt_row gt_center"></td></tr>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">F</td>
+<td class="gt_row gt_center">36 (26%)</td>
+<td class="gt_row gt_center">19 (28%)</td>
+<td class="gt_row gt_center">17 (25%)</td></tr>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">M</td>
+<td class="gt_row gt_center">100 (74%)</td>
+<td class="gt_row gt_center">50 (72%)</td>
+<td class="gt_row gt_center">50 (75%)</td></tr>
+  </tbody>
+  
+  <tfoot>
+    <tr class="gt_footnotes">
+      <td colspan="4">
+        <p class="gt_footnote">
+          <sup class="gt_footnote_marks">
+            <em>1</em>
+          </sup>
+           
+          Mean (SD); Median (IQR); n (%)
+          <br />
+        </p>
+      </td>
+    </tr>
+  </tfoot>
+</table>
+</div>
+</div>
+<div id="regression-modelling" class="section level1" number="8">
+<h1 number="8"><span class="header-section-number">8</span> Regression modelling</h1>
+<p>Now we have our data we can start to address our scientific objectives. Our first ‘inferential’ problem was to test whether there was any effect of treatment on walking speed.</p>
+<div id="exercise-4.-t-test" class="section level2" number="8.1">
+<h2 number="8.1"><span class="header-section-number">8.1</span> Exercise 4. T-test</h2>
+<ol style="list-style-type: decimal">
+<li>Use a t-test to establish whether there was an effect of treatment on walking speed.</li>
+<li>Compare the t-test with and without equal variances.</li>
+</ol>
+</div>
+<div id="worked-example-2.-lm" class="section level2" number="8.2">
+<h2 number="8.2"><span class="header-section-number">8.2</span> Worked Example 2. lm()</h2>
+<p>Now I will introduce the <code>lm()</code> function for linear models. <code>lm()</code> is for linear regression, but it is very important to understand this whatever kind of analysis you are planning, because this function provides the template for doing any kind of statistical modelling in R. T-tests and ANOVA can also be conducted through this <code>linear modelling</code> framework.</p>
+<p>First lets show that the <code>lm()</code> command can produce an identical output to <code>t.test()</code></p>
+<p>Make sure you understand the commands below:</p>
+<pre class="r"><code>model1 &lt;- lm(  time ~ group, data=walkingdat)
+summary(model1)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = time ~ group, data = walkingdat)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -1.6223 -0.7297 -0.3963  0.0604 15.0317 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)   3.1162     0.2257  13.806   &lt;2e-16 ***
+## grouptreat   -0.5065     0.3204  -1.581    0.116    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 1.848 on 131 degrees of freedom
+##   (3 observations deleted due to missingness)
+## Multiple R-squared:  0.01872,    Adjusted R-squared:  0.01123 
+## F-statistic: 2.499 on 1 and 131 DF,  p-value: 0.1163</code></pre>
+<p>How do you interpret this model output? Is there an effect of group on walking speed?</p>
+<pre class="r"><code>t.test( time ~ group,data=walkingdat, var.equal=TRUE)</code></pre>
+<pre><code>## 
+##  Two Sample t-test
+## 
+## data:  time by group
+## t = 1.5808, df = 131, p-value = 0.1163
+## alternative hypothesis: true difference in means between group control and group treat is not equal to 0
+## 95 percent confidence interval:
+##  -0.1273411  1.1403582
+## sample estimates:
+## mean in group control   mean in group treat 
+##              3.116183              2.609674</code></pre>
+<p>So if these outcomes are the same you might wonder why we prefer the linear model function? We should prefer the linear regression because it offers us a lot more flexibility later on.</p>
+</div>
+<div id="worked-example-3.-regression-diagnostics" class="section level2" number="8.3">
+<h2 number="8.3"><span class="header-section-number">8.3</span> Worked Example 3. Regression diagnostics</h2>
+<p>We should always check that the assumption underlying a linear model are met. The assumptions are:</p>
+<ul>
+<li>The residuals (differences between observations and ‘predicted’ values) are identically normally distributed</li>
+<li>The observations are independent of each other</li>
+</ul>
+<p>There is no statistical test for these assumptions, we need to use graphical methods to judge visually whether the first is likely to be reasonable, and our knowledge of the experimental design to know whether the second is true.</p>
+<p>When you ‘plot’ a linear model object the plot() function makes graphs to help you check the distribution of residuals from the model:</p>
+<pre class="r"><code>plot(model1)</code></pre>
+<p><img src="day2_files/figure-html/unnamed-chunk-20-1.png" width="672" /><img src="day2_files/figure-html/unnamed-chunk-20-2.png" width="672" /><img src="day2_files/figure-html/unnamed-chunk-20-3.png" width="672" /><img src="day2_files/figure-html/unnamed-chunk-20-4.png" width="672" /></p>
+<p>The second graph shows a normal qqplot of residuals from the model. If the times were normally distributed aroud their predicted values this would follow the straight dotted line. As it is we can see a significant deviation; there are a lot of residuals that are a lot bigger than the model thinks they should be.</p>
+<p>The first and third graphs are less useful for this regression (because there are only two possible ‘predicted’ values) but they still illustrate that although the residuals are not normally distributed they do at least seem to be similarly distriuted across groups.</p>
+</div>
+<div id="transformations-and-linear-models" class="section level2" number="8.4">
+<h2 number="8.4"><span class="header-section-number">8.4</span> Transformations and linear models</h2>
+<p>In the last section we considered a logarithmic transformation for our descriptive plots. It looked like the data was more ‘normally’ distributed under this transformation.</p>
+<p>We could try to model log(time) as a function of treatment, to see if this meet the assumptions of the regression model better.</p>
+<p>We could create a new variable with the transformed values, or we can add the transformation directly to our model. First we’ll look at the log-transformation:</p>
+<pre class="r"><code>model2 &lt;- lm(  log(time) ~ group ,  data=walkingdat )
+summary(model2)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = log(time) ~ group, data = walkingdat)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -0.65480 -0.21443 -0.05689  0.11010  2.00270 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  1.05620    0.04277  24.694  &lt; 2e-16 ***
+## grouptreat  -0.18865    0.06072  -3.107  0.00232 ** 
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.3501 on 131 degrees of freedom
+##   (3 observations deleted due to missingness)
+## Multiple R-squared:  0.06864,    Adjusted R-squared:  0.06153 
+## F-statistic: 9.654 on 1 and 131 DF,  p-value: 0.002317</code></pre>
+<pre class="r"><code>plot(model2)</code></pre>
+<p><img src="day2_files/figure-html/unnamed-chunk-21-1.png" width="672" /><img src="day2_files/figure-html/unnamed-chunk-21-2.png" width="672" /><img src="day2_files/figure-html/unnamed-chunk-21-3.png" width="672" /><img src="day2_files/figure-html/unnamed-chunk-21-4.png" width="672" /></p>
+<p>Notice how the transformation was entered into the formula. Rather than just sending log transformed values to the regression, the formula understands that <code>log(time)</code> is a logarithmic transformation of our intended outcome variable. This is useful later, for example if we want marginal means from our model (via the <code>emmeans</code> package) because the means will be inverted back to the original scale.</p>
+<p>There is no reason we need to use a log-transform. Remember we are dealing with a ‘time’ variable, but what we might equally be interested in is ‘speed’ which is the reciprocal of this. So we could run:</p>
+<pre class="r"><code>model3 &lt;- lm(  1/time ~ group, data=walkingdat)
+summary(model3)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = 1/time ~ group, data = walkingdat)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -0.38121 -0.06170  0.00132  0.06453  0.30257 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  0.36681    0.01287  28.500  &lt; 2e-16 ***
+## grouptreat   0.07108    0.01827   3.891 0.000158 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.1053 on 131 degrees of freedom
+##   (3 observations deleted due to missingness)
+## Multiple R-squared:  0.1036, Adjusted R-squared:  0.09674 
+## F-statistic: 15.14 on 1 and 131 DF,  p-value: 0.0001583</code></pre>
+<pre class="r"><code>plot(model3)</code></pre>
+<p><img src="day2_files/figure-html/unnamed-chunk-22-1.png" width="672" /><img src="day2_files/figure-html/unnamed-chunk-22-2.png" width="672" /><img src="day2_files/figure-html/unnamed-chunk-22-3.png" width="672" /><img src="day2_files/figure-html/unnamed-chunk-22-4.png" width="672" /></p>
+<p>The final model looks the best. It seems that if we model the inverse of time (speed) instead of time itself then the distribution of the residuals is very close to normal.</p>
+<p>How should we interpret the final model?</p>
+</div>
+<div id="presenting-the-results" class="section level2" number="8.5">
+<h2 number="8.5"><span class="header-section-number">8.5</span> Presenting the results</h2>
+<p>An advantage of regression models is that we get an estimate and confidence interval for our effect as well as a p-value. This is a major disadvantge of analysis or reporting just by placing p-values on plots; by restricting ourselves to this we never get to discuss how much of a difference the treatment makes, and our certainty around that estimate of effect.</p>
+<p>The plain text summary of the model gives us all of the information we need, but there are other packages to organise regression model output in a more comprehensible and publication-ready form.</p>
+<p>For example:</p>
+<pre class="r"><code>tbl_regression(model1, intercept = TRUE, )</code></pre>
+<div id="owufgginbk" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>html {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+}
+
+#owufgginbk .gt_table {
+  display: table;
+  border-collapse: collapse;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#owufgginbk .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#owufgginbk .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#owufgginbk .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 0;
+  padding-bottom: 6px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#owufgginbk .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#owufgginbk .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#owufgginbk .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#owufgginbk .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#owufgginbk .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#owufgginbk .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#owufgginbk .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#owufgginbk .gt_group_heading {
+  padding: 8px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#owufgginbk .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#owufgginbk .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#owufgginbk .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#owufgginbk .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#owufgginbk .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 12px;
+}
+
+#owufgginbk .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#owufgginbk .gt_first_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+}
+
+#owufgginbk .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#owufgginbk .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#owufgginbk .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#owufgginbk .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#owufgginbk .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#owufgginbk .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding: 4px;
+}
+
+#owufgginbk .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#owufgginbk .gt_sourcenote {
+  font-size: 90%;
+  padding: 4px;
+}
+
+#owufgginbk .gt_left {
+  text-align: left;
+}
+
+#owufgginbk .gt_center {
+  text-align: center;
+}
+
+#owufgginbk .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#owufgginbk .gt_font_normal {
+  font-weight: normal;
+}
+
+#owufgginbk .gt_font_bold {
+  font-weight: bold;
+}
+
+#owufgginbk .gt_font_italic {
+  font-style: italic;
+}
+
+#owufgginbk .gt_super {
+  font-size: 65%;
+}
+
+#owufgginbk .gt_footnote_marks {
+  font-style: italic;
+  font-weight: normal;
+  font-size: 65%;
+}
+</style>
+<table class="gt_table">
+  
+  <thead class="gt_col_headings">
+    <tr>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1"><strong>Characteristic</strong></th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1"><strong>Beta</strong></th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1"><strong>95% CI</strong><sup class="gt_footnote_marks">1</sup></th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1"><strong>p-value</strong></th>
+    </tr>
+  </thead>
+  <tbody class="gt_table_body">
+    <tr><td class="gt_row gt_left">(Intercept)</td>
+<td class="gt_row gt_center">3.1</td>
+<td class="gt_row gt_center">2.7, 3.6</td>
+<td class="gt_row gt_center"><0.001</td></tr>
+    <tr><td class="gt_row gt_left">group</td>
+<td class="gt_row gt_center"></td>
+<td class="gt_row gt_center"></td>
+<td class="gt_row gt_center"></td></tr>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">control</td>
+<td class="gt_row gt_center">—</td>
+<td class="gt_row gt_center">—</td>
+<td class="gt_row gt_center"></td></tr>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">treat</td>
+<td class="gt_row gt_center">-0.51</td>
+<td class="gt_row gt_center">-1.1, 0.13</td>
+<td class="gt_row gt_center">0.12</td></tr>
+  </tbody>
+  
+  <tfoot>
+    <tr class="gt_footnotes">
+      <td colspan="4">
+        <p class="gt_footnote">
+          <sup class="gt_footnote_marks">
+            <em>1</em>
+          </sup>
+           
+          CI = Confidence Interval
+          <br />
+        </p>
+      </td>
+    </tr>
+  </tfoot>
+</table>
+</div>
+</div>
+</div>
+<div id="multivariable-models" class="section level1" number="9">
+<h1 number="9"><span class="header-section-number">9</span> Multivariable models</h1>
+<p>We can add the effect of age into our model, simply by changing the model formula in the lm() call:</p>
+<pre class="r"><code>model4 &lt;- lm( 1/time ~ group + age, data=walkingdat)
+tbl_regression(model4)</code></pre>
+<div id="bljzzecmxh" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>html {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+}
+
+#bljzzecmxh .gt_table {
+  display: table;
+  border-collapse: collapse;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#bljzzecmxh .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#bljzzecmxh .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#bljzzecmxh .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 0;
+  padding-bottom: 6px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#bljzzecmxh .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#bljzzecmxh .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#bljzzecmxh .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#bljzzecmxh .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#bljzzecmxh .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#bljzzecmxh .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#bljzzecmxh .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#bljzzecmxh .gt_group_heading {
+  padding: 8px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#bljzzecmxh .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#bljzzecmxh .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#bljzzecmxh .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#bljzzecmxh .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#bljzzecmxh .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 12px;
+}
+
+#bljzzecmxh .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#bljzzecmxh .gt_first_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+}
+
+#bljzzecmxh .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#bljzzecmxh .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#bljzzecmxh .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#bljzzecmxh .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#bljzzecmxh .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#bljzzecmxh .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding: 4px;
+}
+
+#bljzzecmxh .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#bljzzecmxh .gt_sourcenote {
+  font-size: 90%;
+  padding: 4px;
+}
+
+#bljzzecmxh .gt_left {
+  text-align: left;
+}
+
+#bljzzecmxh .gt_center {
+  text-align: center;
+}
+
+#bljzzecmxh .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#bljzzecmxh .gt_font_normal {
+  font-weight: normal;
+}
+
+#bljzzecmxh .gt_font_bold {
+  font-weight: bold;
+}
+
+#bljzzecmxh .gt_font_italic {
+  font-style: italic;
+}
+
+#bljzzecmxh .gt_super {
+  font-size: 65%;
+}
+
+#bljzzecmxh .gt_footnote_marks {
+  font-style: italic;
+  font-weight: normal;
+  font-size: 65%;
+}
+</style>
+<table class="gt_table">
+  
+  <thead class="gt_col_headings">
+    <tr>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1"><strong>Characteristic</strong></th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1"><strong>Beta</strong></th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1"><strong>95% CI</strong><sup class="gt_footnote_marks">1</sup></th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1"><strong>p-value</strong></th>
+    </tr>
+  </thead>
+  <tbody class="gt_table_body">
+    <tr><td class="gt_row gt_left">group</td>
+<td class="gt_row gt_center"></td>
+<td class="gt_row gt_center"></td>
+<td class="gt_row gt_center"></td></tr>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">control</td>
+<td class="gt_row gt_center">—</td>
+<td class="gt_row gt_center">—</td>
+<td class="gt_row gt_center"></td></tr>
+    <tr><td class="gt_row gt_left" style="text-align: left; text-indent: 10px;">treat</td>
+<td class="gt_row gt_center">0.07</td>
+<td class="gt_row gt_center">0.04, 0.11</td>
+<td class="gt_row gt_center"><0.001</td></tr>
+    <tr><td class="gt_row gt_left">age</td>
+<td class="gt_row gt_center">0.00</td>
+<td class="gt_row gt_center">-0.01, 0.00</td>
+<td class="gt_row gt_center">0.014</td></tr>
+  </tbody>
+  
+  <tfoot>
+    <tr class="gt_footnotes">
+      <td colspan="4">
+        <p class="gt_footnote">
+          <sup class="gt_footnote_marks">
+            <em>1</em>
+          </sup>
+           
+          CI = Confidence Interval
+          <br />
+        </p>
+      </td>
+    </tr>
+  </tfoot>
+</table>
+</div>
+<p>It looks like the effect of age is 0! But it is statistically significant, so the low effect size this is probably just a rounding error. We’ll have to change the level of precision being reported in the tabular output (and tweak another couple of options):</p>
+<pre class="r"><code>tbl_regression(model4,  
+               show_single_row=&quot;group&quot;,
+               intercept=TRUE,
+               estimate_fun = function(x) style_ratio(x, digits = 4))</code></pre>
+<div id="opblydewpd" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>html {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+}
+
+#opblydewpd .gt_table {
+  display: table;
+  border-collapse: collapse;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#opblydewpd .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#opblydewpd .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#opblydewpd .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 0;
+  padding-bottom: 6px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#opblydewpd .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#opblydewpd .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#opblydewpd .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#opblydewpd .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#opblydewpd .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#opblydewpd .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#opblydewpd .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#opblydewpd .gt_group_heading {
+  padding: 8px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#opblydewpd .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#opblydewpd .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#opblydewpd .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#opblydewpd .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#opblydewpd .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 12px;
+}
+
+#opblydewpd .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#opblydewpd .gt_first_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+}
+
+#opblydewpd .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#opblydewpd .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#opblydewpd .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#opblydewpd .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#opblydewpd .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#opblydewpd .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding: 4px;
+}
+
+#opblydewpd .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#opblydewpd .gt_sourcenote {
+  font-size: 90%;
+  padding: 4px;
+}
+
+#opblydewpd .gt_left {
+  text-align: left;
+}
+
+#opblydewpd .gt_center {
+  text-align: center;
+}
+
+#opblydewpd .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#opblydewpd .gt_font_normal {
+  font-weight: normal;
+}
+
+#opblydewpd .gt_font_bold {
+  font-weight: bold;
+}
+
+#opblydewpd .gt_font_italic {
+  font-style: italic;
+}
+
+#opblydewpd .gt_super {
+  font-size: 65%;
+}
+
+#opblydewpd .gt_footnote_marks {
+  font-style: italic;
+  font-weight: normal;
+  font-size: 65%;
+}
+</style>
+<table class="gt_table">
+  
+  <thead class="gt_col_headings">
+    <tr>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1"><strong>Characteristic</strong></th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1"><strong>Beta</strong></th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1"><strong>95% CI</strong><sup class="gt_footnote_marks">1</sup></th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1"><strong>p-value</strong></th>
+    </tr>
+  </thead>
+  <tbody class="gt_table_body">
+    <tr><td class="gt_row gt_left">(Intercept)</td>
+<td class="gt_row gt_center">0.6108</td>
+<td class="gt_row gt_center">0.4157, 0.8058</td>
+<td class="gt_row gt_center"><0.001</td></tr>
+    <tr><td class="gt_row gt_left">group</td>
+<td class="gt_row gt_center">0.0732</td>
+<td class="gt_row gt_center">0.0377, 0.1087</td>
+<td class="gt_row gt_center"><0.001</td></tr>
+    <tr><td class="gt_row gt_left">age</td>
+<td class="gt_row gt_center">-0.0043</td>
+<td class="gt_row gt_center">-0.0076, -0.0009</td>
+<td class="gt_row gt_center">0.014</td></tr>
+  </tbody>
+  
+  <tfoot>
+    <tr class="gt_footnotes">
+      <td colspan="4">
+        <p class="gt_footnote">
+          <sup class="gt_footnote_marks">
+            <em>1</em>
+          </sup>
+           
+          CI = Confidence Interval
+          <br />
+        </p>
+      </td>
+    </tr>
+  </tfoot>
+</table>
+</div>
+<p>We should continue to check that the model assumptions are still met.</p>
+<div id="exercise-5.-multivariable-models" class="section level2" number="9.1">
+<h2 number="9.1"><span class="header-section-number">9.1</span> Exercise 5. Multivariable models</h2>
+<ol style="list-style-type: decimal">
+<li>Add a term to the model to check whether walking speed differs between men and women.</li>
+<li>How do you interpret the result?</li>
+</ol>
+<pre class="r"><code>plot(model4)</code></pre>
+<p><img src="day2_files/figure-html/unnamed-chunk-26-1.png" width="672" /><img src="day2_files/figure-html/unnamed-chunk-26-2.png" width="672" /><img src="day2_files/figure-html/unnamed-chunk-26-3.png" width="672" /><img src="day2_files/figure-html/unnamed-chunk-26-4.png" width="672" /></p>
+</div>
+</div>
+<div id="extractor-functions" class="section level1" number="10">
+<h1 number="10"><span class="header-section-number">10</span> Extractor functions</h1>
+<p>Lets go back to the model objects that we are creating. What is the class of <code>model1</code>?</p>
+<pre class="r"><code>class(model1)</code></pre>
+<pre><code>## [1] &quot;lm&quot;</code></pre>
+<p>So our model results are stored in an object of class <code>lm</code> (or <em>linear model</em>). How can we see what information this contains? We have already seen the <code>summary()</code> and <code>plot()</code> functions act when an <code>lm</code> object is passed to them. <code>summary()</code> gives us a model summary, and <code>plot()</code> shows us the regression diagnostics.</p>
+<p>We can see directly what kind of information the model object holds using the <code>names()</code> function. Remember when we applied <code>names()</code> to a data frame it gave us the column names? When we apply <code>names()</code> to a model it will give us the list of elements it contains:</p>
+<pre class="r"><code>names(model1)</code></pre>
+<pre><code>##  [1] &quot;coefficients&quot;  &quot;residuals&quot;     &quot;effects&quot;       &quot;rank&quot;          &quot;fitted.values&quot; &quot;assign&quot;        &quot;qr&quot;           
+##  [8] &quot;df.residual&quot;   &quot;na.action&quot;     &quot;contrasts&quot;     &quot;xlevels&quot;       &quot;call&quot;          &quot;terms&quot;         &quot;model&quot;</code></pre>
+<p>We could, for example, access the model coefficients using:</p>
+<pre class="r"><code>model1$coefficients</code></pre>
+<pre><code>## (Intercept)  grouptreat 
+##   3.1161826  -0.5065085</code></pre>
+<p>in exactly the same way we would access a column in a data frame.</p>
+<p>But it is usually better to use an ‘extractor’ function, that is a function that has been designed to get the information in a more friendly and helpful way than to access this information directly. For example, if we wanted the model coefficients we should really use:</p>
+<pre class="r"><code>coef(model1)</code></pre>
+<pre><code>## (Intercept)  grouptreat 
+##   3.1161826  -0.5065085</code></pre>
+<p>To see what other functions can be used to extract information from this object (or any object), we can use the <code>methods()</code> function as follows:</p>
+<pre class="r"><code>methods(class=&quot;lm&quot;)</code></pre>
+<pre><code>##  [1] add1           alias          anova          case.names     coerce         confint        cooks.distance deviance      
+##  [9] dfbeta         dfbetas        drop1          dummy.coef     effects        extractAIC     family         formula       
+## [17] fortify        hatvalues      influence      initialize     kappa          labels         logLik         model.frame   
+## [25] model.matrix   nobs           plot           predict        print          proj           qqnorm         qr            
+## [33] residuals      rstandard      rstudent       show           simulate       slotsFromS3    summary        variable.names
+## [41] vcov          
+## see &#39;?methods&#39; for accessing help and source code</code></pre>
+<p>From here we can see that there is an <code>anova()</code> function that would give us the analysis of variance corresponding to this model, and functions to give us predictions and residuals from the model. We’ll look at <code>anova()</code> later when we deal with categorical predictors.</p>
+<div id="exercise-6.-extracting-confidence-intervals" class="section level2" number="10.1">
+<h2 number="10.1"><span class="header-section-number">10.1</span> Exercise 6. Extracting confidence intervals</h2>
+<ol style="list-style-type: decimal">
+<li>How you get confidence intervals for model coefficients.</li>
+<li>Can you get the 95% confidence interval for the effect of treatment on <code>1/time</code>.</li>
+<li>Can you get the 90% confidence interval instead?</li>
+</ol>
+</div>
+</div>
+<div id="testing-interactions" class="section level1" number="11">
+<h1 number="11"><span class="header-section-number">11</span> Testing interactions</h1>
+<p>Our existing model does not allow the effect of treatment on walking speed to vary with sex. But we might be interested in whether the effect of <code>group</code> is the same in men or women (a so called ‘interaction’ effect).</p>
+<p><em>Note it is not valid to do this by comparing models estimated in men and women separately. We <strong>must</strong> instead estimate a model that includes the interaction between sex and treatment on walking speed.</em></p>
+<p>Interactions are indicated in R formulas by a <code>*</code> or a <code>:</code> between the terms. When we use <code>:</code> we add the interaction alone, when we use <code>*</code> we add the interaction and the main effects of both variables. So to add the interaction between sex and treatment, as well as the main effects of <code>group</code> and <code>sex</code> we would use:</p>
+<pre class="r"><code>model6 &lt;- lm(1/time ~ age + sex*group, data = walkingdat)
+summary(model6)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = 1/time ~ age + sex * group, data = walkingdat)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -0.35632 -0.06260  0.00784  0.05952  0.30551 
+## 
+## Coefficients:
+##                  Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)      0.605697   0.103422   5.857 3.75e-08 ***
+## age             -0.003984   0.001865  -2.136   0.0346 *  
+## sexM            -0.014755   0.029523  -0.500   0.6181    
+## grouptreat       0.063261   0.034738   1.821   0.0709 .  
+## sexM:grouptreat  0.013762   0.040646   0.339   0.7355    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.104 on 128 degrees of freedom
+##   (3 observations deleted due to missingness)
+## Multiple R-squared:  0.1462, Adjusted R-squared:  0.1195 
+## F-statistic:  5.48 on 4 and 128 DF,  p-value: 0.0004187</code></pre>
+<p>Finally, we can test whether model6 fits the data better than model5. Anova can be used to compare the fit of two models, and give a p-value for whether the more complex model provides a significantly better fit than the simpler one.</p>
+<pre class="r"><code>anova(model4, model6)</code></pre>
+<pre><code>## Analysis of Variance Table
+## 
+## Model 1: 1/time ~ group + age
+## Model 2: 1/time ~ age + sex * group
+##   Res.Df    RSS Df Sum of Sq      F Pr(&gt;F)
+## 1    130 1.3875                           
+## 2    128 1.3848  2 0.0027031 0.1249 0.8827</code></pre>
+<p>Is there any evidence that the effect of treatment varies by sex?</p>
+</div>
+<div id="categorical-predictors-in-regression-models" class="section level1" number="12">
+<h1 number="12"><span class="header-section-number">12</span> Categorical predictors in regression models</h1>
+<p>We might be interested in whether walking speed varies by department. We could add the department variable to our regression model as follows:</p>
+<pre class="r"><code>model7 &lt;- lm( 1/time ~ age + sex + group + department, data=walkingdat)
+summary(model7)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = 1/time ~ age + sex + group + department, data = walkingdat)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -0.34432 -0.04907  0.00962  0.04817  0.29748 
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  0.567301   0.102797   5.519 1.82e-07 ***
+## age         -0.004070   0.001841  -2.211   0.0288 *  
+## sexM        -0.010466   0.021794  -0.480   0.6319    
+## grouptreat   0.073275   0.017821   4.112 6.97e-05 ***
+## department   0.015680   0.008278   1.894   0.0605 .  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.1026 on 128 degrees of freedom
+##   (3 observations deleted due to missingness)
+## Multiple R-squared:  0.1687, Adjusted R-squared:  0.1428 
+## F-statistic: 6.496 on 4 and 128 DF,  p-value: 8.613e-05</code></pre>
+<p>But notice that R has not recognised that the ‘department’ variable should be treated as a categorical variable. To make sure that ‘department’ is treated as categorical we should convert it to a ‘factor’ in our data frame:</p>
+<pre class="r"><code>walkingdat$department_category &lt;- factor(walkingdat$department)</code></pre>
+<p>Note that in the summary of our dataframe, ‘department_factor’ is now treated appropriately. Lets see how the regression output changes:</p>
+<pre class="r"><code>model7 &lt;- lm( 1/time ~ age + sex + group + department_category, data=walkingdat)
+summary(model7)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = 1/time ~ age + sex + group + department_category, 
+##     data = walkingdat)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -0.32209 -0.05030 -0.00242  0.05689  0.29735 
+## 
+## Coefficients:
+##                       Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)           0.594121   0.101966   5.827 4.45e-08 ***
+## age                  -0.004159   0.001868  -2.227 0.027756 *  
+## sexM                 -0.007225   0.021971  -0.329 0.742840    
+## grouptreat            0.070103   0.017997   3.895 0.000158 ***
+## department_category2 -0.012044   0.026657  -0.452 0.652186    
+## department_category3  0.042114   0.025295   1.665 0.098418 .  
+## department_category4  0.031932   0.026365   1.211 0.228110    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.1023 on 126 degrees of freedom
+##   (3 observations deleted due to missingness)
+## Multiple R-squared:  0.1867, Adjusted R-squared:  0.148 
+## F-statistic: 4.822 on 6 and 126 DF,  p-value: 0.0001837</code></pre>
+<p>R has given us an estimate of the effect of each department, compared to department 1, with a p-value corresponding to whether each of departments 2,3, or 4 differ from department 1. It is probably a better question to ask whether the addition of ‘department’ led to a better model, that is, ask for an omnibus test of effect of ‘department’.</p>
+<pre class="r"><code>anova(model4, model7)</code></pre>
+<pre><code>## Analysis of Variance Table
+## 
+## Model 1: 1/time ~ group + age
+## Model 2: 1/time ~ age + sex + group + department_category
+##   Res.Df    RSS Df Sum of Sq      F Pr(&gt;F)
+## 1    130 1.3875                           
+## 2    126 1.3190  4  0.068445 1.6345 0.1696</code></pre>
+<p>We could also use <code>anova()</code> to get the analysis of variance for the whole model:</p>
+<pre class="r"><code>anova(model7)</code></pre>
+<pre><code>## Analysis of Variance Table
+## 
+## Response: 1/time
+##                      Df  Sum Sq  Mean Sq F value    Pr(&gt;F)    
+## age                   1 0.05653 0.056526  5.3996   0.02174 *  
+## sex                   1 0.00112 0.001117  0.1067   0.74447    
+## group                 1 0.17824 0.178243 17.0265 6.651e-05 ***
+## department_category   3 0.06698 0.022327  2.1328   0.09937 .  
+## Residuals           126 1.31904 0.010469                      
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<p>Finally, we might genuinely be interested in comparisons between each pair of levels. The best way to get this is via the <code>emmeans</code> package as follows:</p>
+<pre class="r"><code>library(emmeans)
+emmeans(model7, pairwise~department_category) </code></pre>
+<pre><code>## $emmeans
+##  department_category emmean     SE  df lower.CL upper.CL
+##  1                    0.386 0.0198 126    0.347    0.425
+##  2                    0.374 0.0190 126    0.336    0.412
+##  3                    0.428 0.0165 126    0.396    0.461
+##  4                    0.418 0.0196 126    0.379    0.457
+## 
+## Results are averaged over the levels of: sex, group 
+## Confidence level used: 0.95 
+## 
+## $contrasts
+##  contrast estimate     SE  df t.ratio p.value
+##  1 - 2      0.0120 0.0267 126   0.452  0.9692
+##  1 - 3     -0.0421 0.0253 126  -1.665  0.3466
+##  1 - 4     -0.0319 0.0264 126  -1.211  0.6210
+##  2 - 3     -0.0542 0.0245 126  -2.211  0.1259
+##  2 - 4     -0.0440 0.0260 126  -1.690  0.3332
+##  3 - 4      0.0102 0.0248 126   0.410  0.9766
+## 
+## Results are averaged over the levels of: sex, group 
+## P value adjustment: tukey method for comparing a family of 4 estimates</code></pre>
+<p>The output from emmeans includes a ‘marginal’ estimate for the walking speed in each department, plus an estimate and statistical test for each department compared to every other, with a suitable p-value correction for multiple testing.</p>
+<div id="exercise-7.-interactions" class="section level2" number="12.1">
+<h2 number="12.1"><span class="header-section-number">12.1</span> Exercise 7. Interactions</h2>
+<ol style="list-style-type: decimal">
+<li>Can you use <code>lm()</code> and <code>anova()</code> to test whether the effect of treatment on walking speed varies with department?</li>
+</ol>
+</div>
+</div>
+<div id="extensions-to-other-types-of-models" class="section level1" number="13">
+<h1 number="13"><span class="header-section-number">13</span> Extensions to other types of models</h1>
+<p>Almost every experiment you do can be analysed with this paradigm, that is an outcome variable depending on one or more predictors. And so data from almost every experiment can be analysed and reported with lm() or a related function.</p>
+<p>In practice the modelling functions I find useful for most analyses are:</p>
+<ul>
+<li><code>lm()</code> - regression models and ANOVA</li>
+<li><code>glm()</code> - generalised linear models (count data and binary outcomes in including Poisson and logistic regression)</li>
+<li><code>lmer()</code> and <code>glmer()</code> - from the lme4 package for mixed effects models (when the assumption of independence is not met, analogous to repeated measures ANOVA)</li>
+<li><code>nlme()</code> for non-linear models</li>
+<li>And many others..</li>
+</ul>
+<div id="further-reading-on-analysis-with-r" class="section level2" number="13.1">
+<h2 number="13.1"><span class="header-section-number">13.1</span> Further reading on analysis with R</h2>
+<p>More detailed linear modelling tutorial. <a href="http://tutorials.iq.harvard.edu/R/Rstatistics/Rstatistics.html" class="uri">http://tutorials.iq.harvard.edu/R/Rstatistics/Rstatistics.html</a></p>
+<p>Understanding the linear regression diagnostic plots: <a href="http://www.sthda.com/english/articles/39-regression-model-diagnostics/161-linear-regression-assumptions-and-diagnostics-in-r-essentials/" class="uri">http://www.sthda.com/english/articles/39-regression-model-diagnostics/161-linear-regression-assumptions-and-diagnostics-in-r-essentials/</a></p>
+<p>Using emmeans to get contrasts and margins <a href="https://aosmith.rbind.io/2019/03/25/getting-started-with-emmeans/" class="uri">https://aosmith.rbind.io/2019/03/25/getting-started-with-emmeans/</a></p>
+</div>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
