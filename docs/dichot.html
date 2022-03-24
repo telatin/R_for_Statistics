@@ -428,13 +428,13 @@ ggplot(dat, aes(x=Exposure, y=Outcome)) + geom_point() + theme_bw()</code></pre>
 ##  Pearson&#39;s product-moment correlation
 ## 
 ## data:  dat$Exposure and dat$Outcome
-## t = 1.1295, df = 28, p-value = 0.2683
+## t = 3.8396, df = 28, p-value = 0.000645
 ## alternative hypothesis: true correlation is not equal to 0
 ## 95 percent confidence interval:
-##  -0.1638357  0.5292227
+##  0.2879458 0.7820843
 ## sample estimates:
 ##       cor 
-## 0.2087553</code></pre>
+## 0.5872907</code></pre>
 <p>So in our sample this correlation is clearly detectable (estimated r=0.47, p=0.0075).</p>
 </div>
 <div id="dichotomising-variables" class="section level1" number="5">
@@ -454,13 +454,13 @@ ggplot(dat, aes(x=Exposure, y=Outcome)) + geom_point() + theme_bw()</code></pre>
 ##  Welch Two Sample t-test
 ## 
 ## data:  Outcome by HighExposure
-## t = 0.54828, df = 27.981, p-value = 0.5879
+## t = -2.7842, df = 26.733, p-value = 0.009731
 ## alternative hypothesis: true difference in means between group FALSE and group TRUE is not equal to 0
 ## 95 percent confidence interval:
-##  -0.4580364  0.7928327
+##  -1.7150444 -0.2593407
 ## sample estimates:
 ## mean in group FALSE  mean in group TRUE 
-##            10.17347            10.00607</code></pre>
+##            9.405545           10.392738</code></pre>
 <p>The difference is now barely detectable (p=0.02)!</p>
 <p>We could go further, and dichotomise both the outcome and the exposure.</p>
 <pre class="r"><code>dat$HighOutcome &lt;- dat$Outcome &gt; median(dat$Outcome)
@@ -476,14 +476,14 @@ ggplot(dat, aes(x=Exposure, y=Outcome)) + geom_point() + theme_bw()</code></pre>
 <pre class="r"><code>table(dat$HighExposure, dat$HighOutcome)</code></pre>
 <pre><code>##        
 ##         FALSE TRUE
-##   FALSE     8    7
-##   TRUE      7    8</code></pre>
+##   FALSE    11    4
+##   TRUE      4   11</code></pre>
 <pre class="r"><code>chisq.test(table(dat$HighExposure, dat$HighOutcome))</code></pre>
 <pre><code>## 
 ##  Pearson&#39;s Chi-squared test with Yates&#39; continuity correction
 ## 
 ## data:  table(dat$HighExposure, dat$HighOutcome)
-## X-squared = 0, df = 1, p-value = 1</code></pre>
+## X-squared = 4.8, df = 1, p-value = 0.02846</code></pre>
 <p>The difference in ‘high outcome’ proportions between exposure groups is not statistically significant! (p=0.14). This shows that it is much more difficult to see the relationship if we throw away the exact values of the data points.</p>
 <p>So although there is a real relationship between exposure and outcome that we have been able to detect by correlating the values in our sample, it was harder to detect when we dichotomised the exposure, and we could not detect it at all in the grouped data.</p>
 </div>
