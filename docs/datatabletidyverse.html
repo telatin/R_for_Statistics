@@ -335,10 +335,10 @@ div.tocify {
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="day1.html">Part 1</a>
+      <a href="day1.html">NBI PhD Intro to R Day 1</a>
     </li>
     <li>
-      <a href="day2.html">Part 2</a>
+      <a href="day2.html">Day 2</a>
     </li>
     <li>
       <a href="workshopscript.html">JIC MSc Workshop</a>
@@ -412,12 +412,12 @@ dat &lt;- data.frame(height,sex)</code></pre>
 <p>Now lets quickly check the data looks OK.</p>
 <pre class="r"><code>head(dat)</code></pre>
 <pre><code>##     height    sex
-## 1 174.1137 Female
-## 2 172.2625 Female
-## 3 197.4639   Male
-## 4 177.3805 Female
-## 5 181.5135 Female
-## 6 180.4568 Female</code></pre>
+## 1 167.2168   Male
+## 2 189.8131   Male
+## 3 188.8062   Male
+## 4 193.7094   Male
+## 5 175.0847   Male
+## 6 179.9963 Female</code></pre>
 <pre class="r"><code>boxplot(dat$height~dat$sex)</code></pre>
 <p><img src="datatabletidyverse_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
 </div>
@@ -426,12 +426,12 @@ dat &lt;- data.frame(height,sex)</code></pre>
 <p>The <code>aggregate</code> function can be used to calculate a single statistic over groups as follows:</p>
 <pre class="r"><code>aggregate( height ~ sex , FUN=mean, data=dat)</code></pre>
 <pre><code>##      sex   height
-## 1 Female 181.3424
-## 2   Male 188.0567</code></pre>
+## 1 Female 181.6283
+## 2   Male 188.8004</code></pre>
 <p>Alternatively we could use <code>tapply</code>:</p>
 <pre class="r"><code>tapply( dat$height, dat$sex , FUN=mean )</code></pre>
 <pre><code>##   Female     Male 
-## 181.3424 188.0567</code></pre>
+## 181.6283 188.8004</code></pre>
 <p>While this works it is difficult to get a more complicated table. There is no obvious way to get a table of means, standard deviations and counts without using an external package.</p>
 <p>I’ll illustrate three different approaches of here. <code>data.table</code> and <code>tidyverse</code> add ways to manipulate data</p>
 <p>It is likely that if you spend a lot of time using R you should learn to use one or other (or both) of these systems.</p>
@@ -441,20 +441,19 @@ dat &lt;- data.frame(height,sex)</code></pre>
 <h1 number="4"><span class="header-section-number">4</span> Using <code>data.table</code></h1>
 <p>The <code>data.table</code> package gives us a very flexible way to perform fast grouped operations on datasets. A <code>data.table</code> is an enhanced version of a <code>data.frame</code>, and the main function of <code>data.table</code> an extension to the <code>[ ]</code> operator (square brackets) that is much more powerful than the default R version.</p>
 <p>First we need to load the package, then turn the data.frame into a data.table using <code>setDT</code>.</p>
-<pre class="r"><code>library(data.table)</code></pre>
-<pre><code>## data.table 1.14.0 using 2 threads (see ?getDTthreads).  Latest news: r-datatable.com</code></pre>
-<pre class="r"><code>setDT(dat)</code></pre>
+<pre class="r"><code>library(data.table)
+setDT(dat)</code></pre>
 <p>Then we can use the extended square bracket syntax to create our table.</p>
 <p>First the simple comparison of means:</p>
 <pre class="r"><code>dat[ , mean(height), by=sex ]</code></pre>
 <pre><code>##       sex       V1
-## 1: Female 181.3424
-## 2:   Male 188.0567</code></pre>
+## 1:   Male 188.8004
+## 2: Female 181.6283</code></pre>
 <p>Next, adding the counts and standard deviations:</p>
 <pre class="r"><code>dat[ , .(Count=.N, Mean=mean(height),SD=sd(height)), by=sex]</code></pre>
 <pre><code>##       sex Count     Mean       SD
-## 1: Female    44 181.3424 10.29849
-## 2:   Male    56 188.0567 10.81926</code></pre>
+## 1:   Male    52 188.8004 9.637243
+## 2: Female    48 181.6283 8.569545</code></pre>
 <div id="the-data.table-syntax" class="section level2" number="4.1">
 <h2 number="4.1"><span class="header-section-number">4.1</span> The data.table syntax</h2>
 <p>The <code>[</code> operator in data.table has three arguments. In short, we express a command on a dataset (here called <code>dat</code>) by specifying:</p>
@@ -467,32 +466,21 @@ dat &lt;- data.frame(height,sex)</code></pre>
 <h1 number="5"><span class="header-section-number">5</span> The <code>tidyverse</code> way</h1>
 <p><code>tidyverse</code> is a set of <code>R</code> packages that provide many functions for data manipulation and programming. In particular the <code>dplyr</code> library includes functions for data manipulation and summarisation. To use these we can load the <code>dplyr</code> library:</p>
 <pre class="r"><code>library(dplyr)</code></pre>
-<pre><code>## 
-## Attaching package: &#39;dplyr&#39;</code></pre>
-<pre><code>## The following objects are masked from &#39;package:data.table&#39;:
-## 
-##     between, first, last</code></pre>
-<pre><code>## The following objects are masked from &#39;package:stats&#39;:
-## 
-##     filter, lag</code></pre>
-<pre><code>## The following objects are masked from &#39;package:base&#39;:
-## 
-##     intersect, setdiff, setequal, union</code></pre>
 <p>Then get our results table the <code>tidyverse</code> way:</p>
 <p>First just the means</p>
 <pre class="r"><code>dat %&gt;% group_by(sex) %&gt;% summarise(mean(height))</code></pre>
 <pre><code>## # A tibble: 2 x 2
 ##   sex    `mean(height)`
 ##   &lt;chr&gt;           &lt;dbl&gt;
-## 1 Female           181.
-## 2 Male             188.</code></pre>
+## 1 Female           182.
+## 2 Male             189.</code></pre>
 <p>Now with the counts and standard deviations:</p>
 <pre class="r"><code>dat %&gt;% group_by(sex) %&gt;% summarise(N=n(),mean(height), sd(height))</code></pre>
 <pre><code>## # A tibble: 2 x 4
 ##   sex        N `mean(height)` `sd(height)`
 ##   &lt;chr&gt;  &lt;int&gt;          &lt;dbl&gt;        &lt;dbl&gt;
-## 1 Female    44           181.         10.3
-## 2 Male      56           188.         10.8</code></pre>
+## 1 Female    48           182.         8.57
+## 2 Male      52           189.         9.64</code></pre>
 <div id="the-tidyverse-syntax" class="section level2" number="5.1">
 <h2 number="5.1"><span class="header-section-number">5.1</span> The tidyverse syntax</h2>
 <p><code>dplyr</code> introduces six main functions for manipulating and summarising data, these are <code>mutate</code>, <code>arrange</code>, <code>select</code>, <code>filter</code>, <code>summarise</code>, and <code>group_by</code>. Using combinations of these functions you can perform most simple data operations. Functions are chained together using the pipe operator <code>%&gt;%</code> which passes the output from one into the next. So the first command above reads something like: “take dat, then group it by sex, then for each group return the summary statistics we specified”.</p>
@@ -504,12 +492,12 @@ dat &lt;- data.frame(height,sex)</code></pre>
 <p>Finally to illustrate a package meant specifically for nicely formatted data tabulations, the <code>tbl_summary</code> function from the <code>gtsummary</code> package can create tables of descriptives.</p>
 <pre class="r"><code>library(gtsummary)
 tbl_summary(dat, by=sex, statistic=list(height~&quot;{mean} ({sd})&quot;))</code></pre>
-<div id="fiyzeqkfie" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="dbxdevstut" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#fiyzeqkfie .gt_table {
+#dbxdevstut .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -534,7 +522,7 @@ tbl_summary(dat, by=sex, statistic=list(height~&quot;{mean} ({sd})&quot;))</code
   border-left-color: #D3D3D3;
 }
 
-#fiyzeqkfie .gt_heading {
+#dbxdevstut .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -546,7 +534,7 @@ tbl_summary(dat, by=sex, statistic=list(height~&quot;{mean} ({sd})&quot;))</code
   border-right-color: #D3D3D3;
 }
 
-#fiyzeqkfie .gt_title {
+#dbxdevstut .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -556,7 +544,7 @@ tbl_summary(dat, by=sex, statistic=list(height~&quot;{mean} ({sd})&quot;))</code
   border-bottom-width: 0;
 }
 
-#fiyzeqkfie .gt_subtitle {
+#dbxdevstut .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -566,13 +554,13 @@ tbl_summary(dat, by=sex, statistic=list(height~&quot;{mean} ({sd})&quot;))</code
   border-top-width: 0;
 }
 
-#fiyzeqkfie .gt_bottom_border {
+#dbxdevstut .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#fiyzeqkfie .gt_col_headings {
+#dbxdevstut .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -587,7 +575,7 @@ tbl_summary(dat, by=sex, statistic=list(height~&quot;{mean} ({sd})&quot;))</code
   border-right-color: #D3D3D3;
 }
 
-#fiyzeqkfie .gt_col_heading {
+#dbxdevstut .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -607,7 +595,7 @@ tbl_summary(dat, by=sex, statistic=list(height~&quot;{mean} ({sd})&quot;))</code
   overflow-x: hidden;
 }
 
-#fiyzeqkfie .gt_column_spanner_outer {
+#dbxdevstut .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -619,15 +607,15 @@ tbl_summary(dat, by=sex, statistic=list(height~&quot;{mean} ({sd})&quot;))</code
   padding-right: 4px;
 }
 
-#fiyzeqkfie .gt_column_spanner_outer:first-child {
+#dbxdevstut .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#fiyzeqkfie .gt_column_spanner_outer:last-child {
+#dbxdevstut .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#fiyzeqkfie .gt_column_spanner {
+#dbxdevstut .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -639,7 +627,7 @@ tbl_summary(dat, by=sex, statistic=list(height~&quot;{mean} ({sd})&quot;))</code
   width: 100%;
 }
 
-#fiyzeqkfie .gt_group_heading {
+#dbxdevstut .gt_group_heading {
   padding: 8px;
   color: #333333;
   background-color: #FFFFFF;
@@ -661,7 +649,7 @@ tbl_summary(dat, by=sex, statistic=list(height~&quot;{mean} ({sd})&quot;))</code
   vertical-align: middle;
 }
 
-#fiyzeqkfie .gt_empty_group_heading {
+#dbxdevstut .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -676,15 +664,15 @@ tbl_summary(dat, by=sex, statistic=list(height~&quot;{mean} ({sd})&quot;))</code
   vertical-align: middle;
 }
 
-#fiyzeqkfie .gt_from_md > :first-child {
+#dbxdevstut .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#fiyzeqkfie .gt_from_md > :last-child {
+#dbxdevstut .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#fiyzeqkfie .gt_row {
+#dbxdevstut .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -703,7 +691,7 @@ tbl_summary(dat, by=sex, statistic=list(height~&quot;{mean} ({sd})&quot;))</code
   overflow-x: hidden;
 }
 
-#fiyzeqkfie .gt_stub {
+#dbxdevstut .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -715,7 +703,7 @@ tbl_summary(dat, by=sex, statistic=list(height~&quot;{mean} ({sd})&quot;))</code
   padding-left: 12px;
 }
 
-#fiyzeqkfie .gt_summary_row {
+#dbxdevstut .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -725,7 +713,7 @@ tbl_summary(dat, by=sex, statistic=list(height~&quot;{mean} ({sd})&quot;))</code
   padding-right: 5px;
 }
 
-#fiyzeqkfie .gt_first_summary_row {
+#dbxdevstut .gt_first_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -735,7 +723,7 @@ tbl_summary(dat, by=sex, statistic=list(height~&quot;{mean} ({sd})&quot;))</code
   border-top-color: #D3D3D3;
 }
 
-#fiyzeqkfie .gt_grand_summary_row {
+#dbxdevstut .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -745,7 +733,7 @@ tbl_summary(dat, by=sex, statistic=list(height~&quot;{mean} ({sd})&quot;))</code
   padding-right: 5px;
 }
 
-#fiyzeqkfie .gt_first_grand_summary_row {
+#dbxdevstut .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -755,11 +743,11 @@ tbl_summary(dat, by=sex, statistic=list(height~&quot;{mean} ({sd})&quot;))</code
   border-top-color: #D3D3D3;
 }
 
-#fiyzeqkfie .gt_striped {
+#dbxdevstut .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#fiyzeqkfie .gt_table_body {
+#dbxdevstut .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -768,7 +756,7 @@ tbl_summary(dat, by=sex, statistic=list(height~&quot;{mean} ({sd})&quot;))</code
   border-bottom-color: #D3D3D3;
 }
 
-#fiyzeqkfie .gt_footnotes {
+#dbxdevstut .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -782,13 +770,13 @@ tbl_summary(dat, by=sex, statistic=list(height~&quot;{mean} ({sd})&quot;))</code
   border-right-color: #D3D3D3;
 }
 
-#fiyzeqkfie .gt_footnote {
+#dbxdevstut .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding: 4px;
 }
 
-#fiyzeqkfie .gt_sourcenotes {
+#dbxdevstut .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -802,41 +790,41 @@ tbl_summary(dat, by=sex, statistic=list(height~&quot;{mean} ({sd})&quot;))</code
   border-right-color: #D3D3D3;
 }
 
-#fiyzeqkfie .gt_sourcenote {
+#dbxdevstut .gt_sourcenote {
   font-size: 90%;
   padding: 4px;
 }
 
-#fiyzeqkfie .gt_left {
+#dbxdevstut .gt_left {
   text-align: left;
 }
 
-#fiyzeqkfie .gt_center {
+#dbxdevstut .gt_center {
   text-align: center;
 }
 
-#fiyzeqkfie .gt_right {
+#dbxdevstut .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#fiyzeqkfie .gt_font_normal {
+#dbxdevstut .gt_font_normal {
   font-weight: normal;
 }
 
-#fiyzeqkfie .gt_font_bold {
+#dbxdevstut .gt_font_bold {
   font-weight: bold;
 }
 
-#fiyzeqkfie .gt_font_italic {
+#dbxdevstut .gt_font_italic {
   font-style: italic;
 }
 
-#fiyzeqkfie .gt_super {
+#dbxdevstut .gt_super {
   font-size: 65%;
 }
 
-#fiyzeqkfie .gt_footnote_marks {
+#dbxdevstut .gt_footnote_marks {
   font-style: italic;
   font-weight: normal;
   font-size: 65%;
@@ -847,14 +835,14 @@ tbl_summary(dat, by=sex, statistic=list(height~&quot;{mean} ({sd})&quot;))</code
   <thead class="gt_col_headings">
     <tr>
       <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1"><strong>Characteristic</strong></th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1"><strong>Female</strong>, N = 44<sup class="gt_footnote_marks">1</sup></th>
-      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1"><strong>Male</strong>, N = 56<sup class="gt_footnote_marks">1</sup></th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1"><strong>Female</strong>, N = 48<sup class="gt_footnote_marks">1</sup></th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1"><strong>Male</strong>, N = 52<sup class="gt_footnote_marks">1</sup></th>
     </tr>
   </thead>
   <tbody class="gt_table_body">
     <tr><td class="gt_row gt_left">height</td>
-<td class="gt_row gt_center">181 (10)</td>
-<td class="gt_row gt_center">188 (11)</td></tr>
+<td class="gt_row gt_center">182 (9)</td>
+<td class="gt_row gt_center">189 (10)</td></tr>
   </tbody>
   
   <tfoot>
