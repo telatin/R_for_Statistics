@@ -2,10 +2,13 @@
 title: 'Day 2:  Tidy data and regression models'
 author: "George Savva"
 date: "March 2022"
+always_allow_html: true
 output:
-  word_document:
+  html_document:
+    df_print: paged
+    theme: cosmo
     toc: yes
-    toc_depth: '1'
+    toc_depth: 2
 ---
 
 

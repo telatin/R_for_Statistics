@@ -1,15 +1,13 @@
 ---
 title: "Introduction to ‘R’ statistical software for statistical analysis"
 author: "George Savva, (QIB)"
+always_allow_html: true
 output:
   html_document:
     df_print: paged
     theme: cosmo
     toc: yes
     toc_depth: 2
-  word_document:
-    toc: yes
-    toc_depth: '2'
 ---
 
 
@@ -44,10 +42,15 @@ The aim is to become familiar with the R/RStudio environment and some common fun
 
 Specifically this course will bring you up to the level you need to attend the externally run statistics courses provided at NBI, that assume a working knowledge of R and RStudio.
 
-The data you need to complete the training exercises is in the accompanying file (Introstat.xlsx).  All of the commands for the worked examples and the exercises is in the file TutorialScript.R.  The commands for the worked examples are also typed out here.
-
+The data you need to complete the training exercises is in the accompanying file [Introstat.xlsx](./Introstat.xlsx).  All of the commands for the worked examples and the exercises is in the file TutorialScript.R.  The commands for the worked examples are also typed out here.
 
 For those who have run through these notes already and completed the exercises there are some additional exercises that you can try to complete during the course.
+
+Powerpoint slides for each day's lectures are here:
+
+* [Day 1 slides](./rStatsMar22.pptx)
+* [Day 2 slides](./day2_tidydata.pptx)
+* [Day 3 slides](./day3.pptx.pptx)
 
 `r subsection("Learning objectives")` 
 

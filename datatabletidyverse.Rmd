@@ -58,7 +58,7 @@ tapply( dat$height, dat$sex , FUN=mean )
 
 While this works it is difficult to get a more complicated table.  There is no obvious way to get a table of means, standard deviations and counts without using an external package.
 
-I'll illustrate three different approaches of here.  `data.table` and `tidyverse` add ways to manipulate data and program in R that make life much easier.  
+I'll illustrate three different approaches of here.  `data.table` and `tidyverse` add ways to manipulate data
 
 It is likely that if you spend a lot of time using R you should learn to use one or other (or both) of these systems.
 

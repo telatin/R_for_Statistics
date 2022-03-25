@@ -1,25 +1,51 @@
 
 
 ---
-title: 'Analysis Walkthrough'
+title: 'JIC MSc Workshop: Analysis Walkthrough'
 author: "George Savva"
 date: "March 2022"
 ---
 
 
-# Motivation
+# Introduction
 
-We have an Excel spreadsheet with data corresponding to a walking speed intervention.  Hosptial patients were recruited from five hospital departments and 
+This page supports a short workshop in R and RStudio for Statistics.  It is not intended as a comprehensive tutorial but as a vehicle for demonstrating and discussing some aspects of a typical analysis  using R, with signposting in the lecture notes for further self-directed learning.
 
-Here we report an analysis of this dataset.
+A simple dataset is introduced along with some research questions and I demonstrate a typical process of loading, visualising, cleaning, analysing and reporting the analysis.  The workshop will very briefly introduce:
+
+* the RStudio interface
+* sources of help 
+* using projects and scripts
+* basics of the R language
+* loading data from excel
+* tidy data
+* the tidyverse and data.table systems for data wrangling
+* merging and appending datasets
+* running a R function with named arguments
+* the formula interface
+* how to estimate a linear models
+* ggplot
+
+Supporting material (presentation slides, dataset) is linked.  
+
+A more detailed R tutorial is also available on this site.
+
+# Background to the dataset
+
+We have an Excel spreadsheet with data corresponding to a rehabilitation intervention for stroke patients.  
+
+Hospital patients were recruited from five hospital departments and were randomised to either standard care or an experimental treatment.  The time they took to complete a walking speed task was recorded as the outcome.  A lower time corresponds to a better outcome.
+
+The dataset is here [walkingspeed.xlsx](./walkingspeed.xlsx): 
+A R script including only the R command needed for the analysis is here: [workshopscript.R](./workshopscript.R): 
 
 We will answer the following questions:
 
-* What is the mean and standard deviation of walking speed in each treatment group
-* Does the treatment improve walking speed
-* Is the treatment effect different between men and women
+* What is the mean and standard deviation of walking speed in each treatment group?
+* Does the treatment improve walking speed?
+* Is the treatment effect different between men and women?
 
-Our workflow is:
+Our workflow is typical of most staistical analyses:
 
 * Load data
 * Wrangle
@@ -29,7 +55,9 @@ Our workflow is:
 * Test and model
 * Report
 
-# Load libraries
+# Set up
+
+We will need to install the libraries below if we don't already have them.  We should also start a new project in the project directory, and download the data and the code if necessary.
 
 ```{r }
 
@@ -42,7 +70,9 @@ library(readxl)
 
 # Load data
 
-We should inspect the data in Excel.  Note there are three sheets that we need to combine.  We need to lead 
+We should inspect the data in Excel.  Note there are three sheets that we need to combine to do our analysis.  
+
+Review the "tidy data" powerpoint presentation here: [day2_tidydata.pptx](./day2_tidydata.pptx).
 
 ```{r }
 treated <- read_excel(path="walkingspeed.xlsx", 
@@ -51,6 +81,7 @@ treated <- read_excel(path="walkingspeed.xlsx",
 ```
 
 Notes:
+
 * The library readxl for reading Excel sheets.  There are alternatives but I find this works well.
 * Multiline function call
 * Named arguments
@@ -83,7 +114,9 @@ str(control)
 ```
 
 Notes:
+
 * Data can be numeric, character strings, (factors or logical)
+* Do we know what each of these types is for?
 
 # Access elements from the dataframe
 
@@ -103,16 +136,15 @@ log(control$walktime[1:5])
 
 For analysis we will need all the data into one data frame.  We need to append (row bind) the treatment and control results, then merge (join)  the meta data.
 
-
 ```{r }
 # Remind ourselves of the structure of the dataset
 str(treated)
 str(control)
 ```
 
-We need to make sure the vectors we are merging have the same type and name
+We need to make sure the vectors we are merging have the same type and name!
 
-There are a lot of ways to do the same thing!
+There are a lot of ways to do the same thing.  Here I am illustrating the 'base' R way, the 'tidyverse' way and the 'data.table' way to convert a new numeric variable from a character variable.
 
 ```{r }
 # Base R
@@ -126,11 +158,14 @@ treated[ , walktime := as.numeric(time)  ]
 treated <- treated %>% mutate(walktime = as.numeric(time))
 ```
 
-Now we can append the rows:
+Now we can append the rows and merge them with the metadata.  Again there is a `tidyverse` function for this, and a `data.table` function for this.
 
 ```{r }
 # data.table
 combined <- rbind(treated, control, fill=TRUE)
+combined <- rbind(treated=treated, 
+                  control=control, 
+                  fill=TRUE, idcol="group")
 # tidyverse
 combined <- bind_rows(treated, control)
 combined <- bind_rows(treated = treated, 
@@ -152,6 +187,8 @@ summary(walkingdata)
 
 # Describe
 
+Our first task was to describe the mean and standard deviation of walking time by group.  There is no simple way to do this with base R.  Possible `tidyverse` and `data.table` approaches are shown below.  
+
 ```{r }
 # Tidyverse
 walkingdata %>% 
@@ -167,6 +204,8 @@ walkingdata[!is.na(walktime) ,
 
 
 # Visualise
+
+Base R graphics are difficult to work with.  `ggplot2` provides an excellent system for graphing scientific data using R.  See the associated slides and flipbook.
 
 ```{r  }
 # A very bad graph
@@ -198,6 +237,8 @@ ggplot(walkingdata) +
 
 # Clean data
 
+Our graphics suggest that there are some data points that are probably technical failures.  We should remove these.
+
 ```{r }
 # base
 walkingdata$walktime[ walkingdata$walktime > 100 ] <- NA
@@ -209,19 +250,29 @@ walkingdata[ walktime<0.1 , walktime := NA]
 
 # Simple tests
 
+Now we can conduct a simple statistical test of the walking speed across groups.  Note the 'formula' interface:
+
 ```{r }
 t.test( data = walkingdata , walktime ~ group)
 ttest1 <- t.test( data = walkingdata , walktime ~ group)
 ttest1$p.value
 ```
 
+What does this suggest about the treatment effectiveness?
+
 # Model
+
+This test ignores much of what we know about these participants, and may not be suitable.  A linear model is a better paradiagm for statistical analysis.  It allows us to build more complex analyses, and easily test our assumptions.
+
 ```{r }
 lm1 <- lm( data = walkingdata , walktime ~ group)
 summary(lm1)
 confint(lm1)
 ```
+
 # Diagnose
+
+The diagnostics suggest something is wrong.  We can transform the data so that the assumptions of the model are met.
 
 ```{r }
 plot(lm1)
@@ -238,7 +289,11 @@ summary(lm3)
 gtsummary::tbl_regression(lm3)
 ```
 
+Is the interpretation different now?
+
 # Augment model
+
+We can develop the model by adding terms for age and department. We should always include these because they explain variance in the outcome measure.
 
 ```{r }
 lm4 <- lm( data = walkingdata , 1/walktime ~ group + age + sex + department)
@@ -251,6 +306,8 @@ anova(lm5 , update(lm5, . ~ . -age))
 ```
 
 # Interactions
+
+To test whether the treatment effect varies by sex we should test the `group*sex` interaction. 
 
 ```{r }
 lm6 <- lm( data = walkingdata , 1/walktime ~ group*sex + age +  factor(department))
@@ -273,3 +330,5 @@ g1 <- ggplot(treatmentestimates) + aes(x=sex, y=estimate, ymin=lower.CL, ymax=up
 g1 
 g1 + coord_flip()
 ```  
+
+What does this suggest.  Does the treatment work in men and women?

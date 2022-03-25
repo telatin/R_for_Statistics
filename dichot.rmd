@@ -8,7 +8,14 @@ author: "George Savva, (QIB)"
 knitr::opts_chunk$set(echo = TRUE, warning=FALSE, message=FALSE)
 ```
 
-## Motivation
+# Summary
+
+If we have continuous data then we should keep it continuous in analysis.  Grouping samples into (say) 'high' vs 'low' or 'recovered' vs 'not recovered' throws away information and makes it more difficult to detect associations.  The power of your study is reduced and the sample size needed goes up.
+
+```{r }
+
+```
+# Motivation
 
 Suppose we are interested in the effect of an exposure on an outcome, and we have measured both in a sample.  Both our exposure and our outcome are measured as continuous variables, for example we might be interested in the effect of fibre intake on gut microbial diversity.
 
@@ -18,7 +25,7 @@ Alternatively we could dichotomise the exposure, splitting the samples into a "h
 
 Which should we choose?  Intuitively we might prefer the dichotomised version for ease of interpretation, but how does it affect our ability to detect any association?
 
-## Packages
+# Packages
 
 We'll need the following R packages for this simulation:
 ```{r }
@@ -32,7 +39,7 @@ library(data.table)
 ```
 
 
-## Dataset
+# Dataset
 
 Suppose our exposure and outcome are both normally distributed with a correlation of 0.5.
 
@@ -54,7 +61,7 @@ cor.test(dat$Exposure, dat$Outcome)
 
 So in our sample this correlation is clearly detectable (estimated r=0.47, p=0.0075).
 
-## Dichotomising variables
+# Dichotomising variables
 
 Dichotomising means splitting variables into two groups.  In our example we might decide to compare those with a `high` vs a `low` exposure.  Lets make a variable corresponding to whether the exposure for each participant is above observed median.  This will split the data into two groups, and we can describe how the outcome differs between the high and low exposure groups:
 
@@ -102,7 +109,7 @@ The difference in 'high outcome' proportions between exposure groups is not stat
 
 So although there is a real relationship between exposure and outcome that we have been able to detect by correlating the values in our sample, it was harder to detect when we dichotomised the exposure, and we could not detect it at all in the grouped data.
 
-## Implications for power and sample size
+# Implications for power and sample size
 
 Our single example illustrated that dichotomising data made analysis difficult or impossible by discarding data.  
 
@@ -141,7 +148,7 @@ ggplot(melt(powers,id.vars = "sampleSizes", variable.name = "Analysis", value.na
 ```
 
 
-## Conclusion
+# Conclusion
 
 Grouping up our continuous variables for analysis throws away information.  It makes associations more difficult to detect, and increases the number of samples we need to analyse.
 
