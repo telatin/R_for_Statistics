@@ -428,13 +428,13 @@ ggplot(dat, aes(x=Exposure, y=Outcome)) + geom_point() + theme_bw()</code></pre>
 ##  Pearson&#39;s product-moment correlation
 ## 
 ## data:  dat$Exposure and dat$Outcome
-## t = 3.672, df = 28, p-value = 0.001005
+## t = 2.8188, df = 28, p-value = 0.008749
 ## alternative hypothesis: true correlation is not equal to 0
 ## 95 percent confidence interval:
-##  0.2640910 0.7718514
+##  0.1322991 0.7101417
 ## sample estimates:
-##       cor 
-## 0.5701171</code></pre>
+##      cor 
+## 0.470159</code></pre>
 <p>So in our sample this correlation is clearly detectable (estimated r=0.47, p=0.0075).</p>
 </div>
 <div id="dichotomising-variables" class="section level1" number="5">
@@ -454,13 +454,13 @@ ggplot(dat, aes(x=Exposure, y=Outcome)) + geom_point() + theme_bw()</code></pre>
 ##  Welch Two Sample t-test
 ## 
 ## data:  Outcome by HighExposure
-## t = -3.177, df = 20.431, p-value = 0.00465
+## t = -1.6283, df = 26.387, p-value = 0.1153
 ## alternative hypothesis: true difference in means between group FALSE and group TRUE is not equal to 0
 ## 95 percent confidence interval:
-##  -1.9128665 -0.3977829
+##  -1.049005  0.121284
 ## sample estimates:
 ## mean in group FALSE  mean in group TRUE 
-##            9.527325           10.682650</code></pre>
+##            9.859304           10.323165</code></pre>
 <p>The difference is now barely detectable (p=0.02)!</p>
 <p>We could go further, and dichotomise both the outcome and the exposure.</p>
 <pre class="r"><code>dat$HighOutcome &lt;- dat$Outcome &gt; median(dat$Outcome)
