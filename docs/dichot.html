@@ -14,8 +14,8 @@
 
 <title>Why is ‘grouping’ your samples bad for analysis?</title>
 
-<script src="site_libs/header-attrs-2.10/header-attrs.js"></script>
-<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<script src="site_libs/header-attrs-2.13/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
 <script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
@@ -66,6 +66,7 @@ if (window.hljs) {
 
 
 
+
 <style type = "text/css">
 .main-container {
   max-width: 940px;
@@ -86,6 +87,9 @@ button.code-folding-btn:focus {
 }
 summary {
   display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
 }
 pre code {
   padding: 0;
@@ -311,7 +315,7 @@ div.tocify {
 <div class="navbar navbar-default  navbar-fixed-top" role="navigation">
   <div class="container">
     <div class="navbar-header">
-      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
@@ -328,7 +332,7 @@ div.tocify {
   </a>
 </li>
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Intro to R for Statistics
      
     <span class="caret"></span>
@@ -341,6 +345,9 @@ div.tocify {
       <a href="day2.html">Day 2</a>
     </li>
     <li>
+      <a href="day3.html">Day 3</a>
+    </li>
+    <li>
       <a href="workshopscript.html">JIC MSc Workshop</a>
     </li>
     <li>
@@ -349,7 +356,7 @@ div.tocify {
   </ul>
 </li>
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Statistics notes
      
     <span class="caret"></span>
@@ -428,13 +435,13 @@ ggplot(dat, aes(x=Exposure, y=Outcome)) + geom_point() + theme_bw()</code></pre>
 ##  Pearson&#39;s product-moment correlation
 ## 
 ## data:  dat$Exposure and dat$Outcome
-## t = 2.8188, df = 28, p-value = 0.008749
+## t = 2.3043, df = 28, p-value = 0.02884
 ## alternative hypothesis: true correlation is not equal to 0
 ## 95 percent confidence interval:
-##  0.1322991 0.7101417
+##  0.04554063 0.66401588
 ## sample estimates:
-##      cor 
-## 0.470159</code></pre>
+##       cor 
+## 0.3992593</code></pre>
 <p>So in our sample this correlation is clearly detectable (estimated r=0.47, p=0.0075).</p>
 </div>
 <div id="dichotomising-variables" class="section level1" number="5">
@@ -454,13 +461,13 @@ ggplot(dat, aes(x=Exposure, y=Outcome)) + geom_point() + theme_bw()</code></pre>
 ##  Welch Two Sample t-test
 ## 
 ## data:  Outcome by HighExposure
-## t = -1.6283, df = 26.387, p-value = 0.1153
+## t = -1.3704, df = 27.897, p-value = 0.1815
 ## alternative hypothesis: true difference in means between group FALSE and group TRUE is not equal to 0
 ## 95 percent confidence interval:
-##  -1.049005  0.121284
+##  -1.3942983  0.2766186
 ## sample estimates:
 ## mean in group FALSE  mean in group TRUE 
-##            9.859304           10.323165</code></pre>
+##            10.09329            10.65213</code></pre>
 <p>The difference is now barely detectable (p=0.02)!</p>
 <p>We could go further, and dichotomise both the outcome and the exposure.</p>
 <pre class="r"><code>dat$HighOutcome &lt;- dat$Outcome &gt; median(dat$Outcome)

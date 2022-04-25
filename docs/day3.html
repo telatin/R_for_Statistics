@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="George Savva" />
+
+
+<title>Intro to R day 3 - Notes on Graphing</title>
+
+<script src="site_libs/header-attrs-2.13/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet" />
+<script src="site_libs/pagedtable-1.1/js/pagedtable.js"></script>
+<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.tab('show');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">R for Statistics</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">
+    <span class="fa fa-home"></span>
+     
+    Home
+  </a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    Intro to R for Statistics
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="day1.html">NBI PhD Intro to R Day 1</a>
+    </li>
+    <li>
+      <a href="day2.html">Day 2</a>
+    </li>
+    <li>
+      <a href="day3.html">Day 3</a>
+    </li>
+    <li>
+      <a href="workshopscript.html">JIC MSc Workshop</a>
+    </li>
+    <li>
+      <a href="flipbook.html">ggplot example</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    Statistics notes
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="dichot.html">Don't group your data points</a>
+    </li>
+  </ul>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="mailto:george.savva@quadram.ac.uk">
+    <span class="fa fa-envelope-o"></span>
+     
+    Contact me
+  </a>
+</li>
+<li>
+  <a href="https://github.com/georgemsavva">
+    <span class="fa fa-github"></span>
+     
+    GitHub
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">Intro to R day 3 - Notes on Graphing</h1>
+<h4 class="author">George Savva</h4>
+<h4 class="date">April 2022</h4>
+
+</div>
+
+
+<p>The dataset to support today’s work is here: <a href="./walkingspeed.xlsx">walkingspeed.xlsx</a>:</p>
+<p>Powerpoint slides are here: <a href="./day3.pptx">day3.pptx</a></p>
+<p>An explanation/breakdown of the code for a typical ggplot2 graph is here: <a href="./flipbook.html">flipbook.html</a></p>
+<p>Plotting data is an essential part of data analysis and reporting. Your plots communicate your results, and a good plot can be the difference between a successful and unsuccessful communication.</p>
+<p>In this session we’ll think about how to plot your data, what makes a good vs a bad plot, and illustrate some concepts for plotting using R.</p>
+<p>Learning objectives:</p>
+<ul>
+<li>What to plot</li>
+<li>A few principles for designing a good graph</li>
+<li>Plotting in R with ggplot</li>
+</ul>
+<div id="what-to-plot" class="section level1" number="1">
+<h1 number="1"><span class="header-section-number">1</span> What to plot</h1>
+<p>While a good picture can be worth a thousand words, a bad picture can be worth none, or even do more harm than good.</p>
+<p>Your data is likely to be complex, and you will have limited space for plotting in your reports, and so you should think carefully about which plots are important and how to choose to display your data.</p>
+<p>Generally there are two reasons to plot data, that mirror the two main types of statistical analyses we can perform.</p>
+<p>The first is to describe data (mirroring our descriptive analyses), the second is to describe results that come from the data (mirroring our inferential analyses). Often we are forced to meet these two objectives in the same graph, which can cause some tension!</p>
+</div>
+<div id="walking-speed-data" class="section level1" number="2">
+<h1 number="2"><span class="header-section-number">2</span> Walking speed data</h1>
+<p>Lets see an example. Consider our walking speed data.</p>
+<p>Recall our aim was to test whether a rehabilitation intervention improves walking speed. We had data from a clinical trial among older men and women recruited from several hospital departments.</p>
+<p>What are the different reasons we might make plots of the data?<br />
+In each case, who is the audience and what information to we want to extract or display?</p>
+<!----
+* Describe dataset
+ + Distribution of data
+ + Describe population
+ + Find outliers or other problems
+ + Preliminary comparison of means
+ + Choose a statistical method
+
+* Describe results
+ + For ourselves / collaborators
+ + Validate a statistical model
+ + For scientific publications and presentations:
+ + Show effect size
+ + Show confidence in effect size
+ + Show statistical significance
+ + Public communication of findings
+!-->
+<p>These aspects might all need kinds of different plots at different stages of the project.</p>
+<p>Each plot we produce needs to meet its own need. We should think about what we want to see, and then work out how to get it.</p>
+<div id="descriptive-plots" class="section level2" number="2.1">
+<h2 number="2.1"><span class="header-section-number">2.1</span> Descriptive plots</h2>
+<p>Before we model data we should visualise it. This crucial first step is often omitted in analyses and reports. Consider the follow example, that I have designed after a real analysis I worked on earlier this year, where an outcome was compared between two treatment conditions:</p>
+<pre class="r"><code>library(ggplot2)
+library(ggpubr)
+set.seed(12345)
+N=12
+y &lt;- c(runif(N), c(runif(N-2), 4.5,6))
+x &lt;- factor(rep(c(1,2), each=N))
+ggplot(data.frame(Group=x,y), aes(x,y)) + 
+  stat_summary(geom=&quot;col&quot;,width=0.5, fill=&quot;red&quot;) + 
+  stat_summary(geom=&quot;errorbar&quot;, width=0.2) + 
+  theme_bw()+ stat_compare_means(label.y = 2)</code></pre>
+<p><img src="day3_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
+<p>On the face of it, it looks like the outcome is higher in group 2 than group 1. If this is all you see then this is surely the conclusion you would come to.</p>
+<p>But why is the p-value so high? And how well do you feel like you understand the data from this graph?</p>
+<p>Consider now how you would interpret this:</p>
+<pre class="r"><code>library(ggplot2)
+ggplot(data.frame(Group=x,y), aes(x,y)) + 
+  geom_point() + 
+  theme_bw()</code></pre>
+<p><img src="day3_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+<p>Quite differently? At least with this second visualisation we can see the data and draw our conclusions about what is going on directly.</p>
+<p>Also consider, the first graph only shows you four values, two means and two standard errors (if that is what they are, I never actually told you). It’s a complete waste of ink. But how often do you see this first presentation in the scientific papers your read? When I see one of these I can’t help but wonder what horrors it is hiding.</p>
+<p>The second graph tells us quite a lot. It tells us to maybe check our outlying data points, or to try transforming our data before analysis. We might even conclude that the two groups are more-or-less the same, except for two individuals, which may well be a real effect of treatment that is limited to specific individuals. In any case we learn a lot.</p>
+<p>So our most important rule is: always plot your data, and not summaries of the data.</p>
+<p>Ideally, if we have a dataset with several variables, we will make something like a graph matrix showing every variable against every other variable. This will help us identify any potential problems or outliers in 2-dimensions.</p>
+<p>The <code>ggpairs</code> function in the <code>GGally</code> package gives us a grid layout showing all of these combinations. I think its a reasonable summary.</p>
+<pre class="r"><code>library(readxl)
+library(GGally)
+walkingdata &lt;- read_excel(path=&quot;walkingspeed.xlsx&quot;, sheet=&quot;fixed&quot;)
+walkingdata$department &lt;- factor(walkingdata$department)
+walkingdata$time &lt;- as.numeric(walkingdata$time)
+walkingdata$time[walkingdata$time&gt;100] &lt;- NA
+walkingdata$time[walkingdata$time&lt;1] &lt;- NA
+ggpairs(walkingdata, columns=1:6)</code></pre>
+<p><img src="day3_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+<p>Note I’m not wasting a lot of time making this graph pretty. It’s for me only, I don’t care what it looks like, I just want to see the data as quickly and as effectively as possible. I’ve also left patient ID in here as a variable, there’s no harm doing this, and it might show me if any data errors have occurred.</p>
+<p>Does this graph meet all of the objectives that we set out for our ‘descriptive’ analyses above?</p>
+</div>
+<div id="inferential-graphs" class="section level2" number="2.2">
+<h2 number="2.2"><span class="header-section-number">2.2</span> Inferential graphs</h2>
+<p>While the descriptive graphs tells us about the data, it doesn’t tell us much about the comparison we are interested in making.</p>
+<p>To think about how we could graph that, first think about what exactly it is we are trying to show.</p>
+<p>Lets go back to our linear model from last time:</p>
+<pre class="r"><code>model1 &lt;- lm(data=walkingdata, log(time) ~ group + sex + age + factor(department))
+summary(model1)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = log(time) ~ group + sex + age + factor(department), 
+##     data = walkingdata)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -0.66614 -0.17268 -0.02574  0.09920  1.76808 
+## 
+## Coefficients:
+##                      Estimate Std. Error t value Pr(&gt;|t|)   
+## (Intercept)          0.180866   0.343877   0.526  0.59985   
+## grouptreat          -0.184903   0.059587  -3.103  0.00237 **
+## sexM                 0.038621   0.072702   0.531  0.59620   
+## age                  0.014986   0.006238   2.402  0.01777 * 
+## factor(department)2  0.108484   0.088572   1.225  0.22295   
+## factor(department)3 -0.097133   0.084065  -1.155  0.25011   
+## factor(department)4 -0.057919   0.087749  -0.660  0.51044   
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.3378 on 125 degrees of freedom
+##   (3 observations deleted due to missingness)
+## Multiple R-squared:  0.1723, Adjusted R-squared:  0.1325 
+## F-statistic: 4.336 on 6 and 125 DF,  p-value: 0.0005211</code></pre>
+<p>What is the key information here that we need to communicate?</p>
+<p>We should say what our estimate of the treatment effect is, and how sure we are of this. That is the ‘actionable’ result from this work, and that is what we want people to take away from our analysis. The fact of the treatments being ‘significantly’ different is interesting but not enough on its own. So from our analysis we should be trying to communicate the estimate of treatment effect, the standard error of treatment effect, and potentially the p-value and a confidence interval for the difference.</p>
+<p>The mean time in each group is perhaps interesting descriptively, so people can understand our sample. It’s hard to see why the standard error within each group should be of interest.</p>
+<p>So - do I even need a graph? Should this summary statistic, mean difference = 0.19 (standard error=0.06; p=0.0015) be enough? Recall that this was calculated on a logarithmic scale, so it’s probably best to exponentiate it and report a ratio:</p>
+<pre class="r"><code>library(emmeans)
+em1 &lt;- emmeans(model1, 
+               trt.vs.ctrl~group, 
+               type=&quot;response&quot;)$contrast
+confint(em1)</code></pre>
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["contrast"],"name":[1],"type":["fct"],"align":["left"]},{"label":["ratio"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["SE"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["df"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["lower.CL"],"name":[5],"type":["dbl"],"align":["right"]},{"label":["upper.CL"],"name":[6],"type":["dbl"],"align":["right"]}],"data":[{"1":"treat / control","2":"0.8311845","3":"0.04952738","4":"125","5":"0.7387228","6":"0.9352192","_rn_":"1"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+<p>So we could say “times for treated group were 83% of the times for the control group (95% CI=74% to 93%)”. Or: “treatment improved times by 17% (95% CI=7-26%).”</p>
+<p>Is this enough? I think so, if combined with a visual summary that persuades us that the model is reasonable, and we have the descriptive graph that shows us this difference in the context of the variance in the data.</p>
+<p>Compare this with the traditional presentation:</p>
+<pre class="r"><code>library(ggpubr) # includes the stat_compare_means function
+ggplot(walkingdata, aes(x=group, y=time)) + 
+  stat_summary(geom=&quot;col&quot;, width=0.5, fill=&quot;red&quot;) + 
+  stat_summary(geom=&quot;errorbar&quot;, width=.2) + 
+  scale_x_discrete(na.translate=FALSE) + 
+  theme_bw() + 
+  stat_compare_means()</code></pre>
+<p><img src="day3_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<p>or better, but still not so informative:</p>
+<pre class="r"><code>library(ggpubr)
+library(ggbeeswarm)
+ggplot(remove_missing(walkingdata), aes(x=group, y=time)) + 
+  geom_beeswarm(col=&quot;grey&quot;) + 
+  stat_summary(geom=&quot;errorbar&quot;, width=.2) + 
+  stat_summary(geom=&quot;point&quot;, width=.2) + 
+  theme_bw()+ scale_y_log10() + 
+  stat_compare_means(method=&quot;t.test&quot;,
+                     label = &quot;p.signif&quot;,
+                     comparisons=list(c(&quot;treated&quot;, &quot;control&quot;)))</code></pre>
+<p><img src="day3_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
+<p>Could you say what the treatment effect is by looking at this graph? How sure would you be about it? Also, how would you represent a model other than a simple comparison of means (for example, the multiple linear regression model that we estimated). By confusing the descriptive with the inferential graph we are limiting our ability to conduct the appropriate statistical analysis.</p>
+<p>Suppose we wanted to compare several groups, say time over department, then a visualisation might be useful:</p>
+<pre class="r"><code>library(emmeans)
+library(broom)
+em2 &lt;- emmeans(model1, 
+               trt.vs.ctrl~department, 
+               type=&quot;response&quot;)$contrast
+td &lt;- tidy(em2, conf.int = TRUE)
+td</code></pre>
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":["term"],"name":[1],"type":["chr"],"align":["left"]},{"label":["contrast"],"name":[2],"type":["chr"],"align":["left"]},{"label":["null.value"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["ratio"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["std.error"],"name":[5],"type":["dbl"],"align":["right"]},{"label":["df"],"name":[6],"type":["dbl"],"align":["right"]},{"label":["conf.low"],"name":[7],"type":["dbl"],"align":["right"]},{"label":["conf.high"],"name":[8],"type":["dbl"],"align":["right"]},{"label":["null"],"name":[9],"type":["dbl"],"align":["right"]},{"label":["statistic"],"name":[10],"type":["dbl"],"align":["right"]},{"label":["adj.p.value"],"name":[11],"type":["dbl"],"align":["right"]}],"data":[{"1":"department","2":"2 / 1","3":"0","4":"1.1145866","5":"0.09872092","6":"125","7":"0.9020080","8":"1.377264","9":"1","10":"1.2248098","11":"0.4708196"},{"1":"department","2":"3 / 1","3":"0","4":"0.9074353","5":"0.07628368","6":"125","7":"0.7423153","8":"1.109285","9":"1","10":"-1.1554490","11":"0.5141293"},{"1":"department","2":"4 / 1","3":"0","4":"0.9437269","5":"0.08281106","6":"125","7":"0.7652382","8":"1.163847","9":"1","10":"-0.6600477","11":"0.8188968"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+<pre class="r"><code>ggplot(td) + 
+  aes(x=contrast, y=ratio, ymax=conf.high, ymin=conf.low) + 
+  geom_pointrange() + 
+  coord_flip() + 
+  geom_hline(yintercept=1) + theme_bw()</code></pre>
+<p><img src="day3_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+</div>
+</div>
+<div id="discuss-real-example-not-included" class="section level1" number="3">
+<h1 number="3"><span class="header-section-number">3</span> Discuss real example (not included)</h1>
+</div>
+<div id="some-tips-for-making-a-good-graph" class="section level1" number="4">
+<h1 number="4"><span class="header-section-number">4</span> Some tips for making a good graph</h1>
+<p>Some tips:</p>
+<ul>
+<li>Consider a horizontal layout - key comparisons should be made vertically.</li>
+<li>Avoid colour. If you need to use colour, then use colorblind safe palettes.</li>
+<li>Never use ‘dynamite’ charts</li>
+<li>Plot your individual data points where you can</li>
+<li>Plot estimates and confidence intervals of important estimands, not groups</li>
+<li>Never use pie charts</li>
+<li>Legends should be avoided if possible, but are sometimes essential</li>
+<li>Maps, 3D or animation can really help, but can also get in the way so use with care.</li>
+<li>Always label axes fully, and make it clear what error bars correspond to.</li>
+<li>Consider your ink/information ratio. Is your graph really needed?</li>
+<li>Use gridlines</li>
+<li>Be careful when trying to represent data and analysis in the same picture.</li>
+<li>Never let a graph dictate your analysis.</li>
+<li>Check with other people that your graph is easy to understand. Ask them what they understand from it.</li>
+<li>Read up on data viz.</li>
+</ul>
+<p>Now go read this:</p>
+<p><a href="https://www.cedricscherer.com/2019/05/17/the-evolution-of-a-ggplot-ep.-1/" class="uri">https://www.cedricscherer.com/2019/05/17/the-evolution-of-a-ggplot-ep.-1/</a></p>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

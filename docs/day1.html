@@ -14,8 +14,8 @@
 
 <title>Introduction to ‘R’ statistical software for statistical analysis</title>
 
-<script src="site_libs/header-attrs-2.10/header-attrs.js"></script>
-<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<script src="site_libs/header-attrs-2.13/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
 <script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
@@ -68,6 +68,7 @@ if (window.hljs) {
 
 
 
+
 <style type = "text/css">
 .main-container {
   max-width: 940px;
@@ -88,6 +89,9 @@ button.code-folding-btn:focus {
 }
 summary {
   display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
 }
 pre code {
   padding: 0;
@@ -313,7 +317,7 @@ div.tocify {
 <div class="navbar navbar-default  navbar-fixed-top" role="navigation">
   <div class="container">
     <div class="navbar-header">
-      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
@@ -330,7 +334,7 @@ div.tocify {
   </a>
 </li>
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Intro to R for Statistics
      
     <span class="caret"></span>
@@ -343,6 +347,9 @@ div.tocify {
       <a href="day2.html">Day 2</a>
     </li>
     <li>
+      <a href="day3.html">Day 3</a>
+    </li>
+    <li>
       <a href="workshopscript.html">JIC MSc Workshop</a>
     </li>
     <li>
@@ -351,7 +358,7 @@ div.tocify {
   </ul>
 </li>
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Statistics notes
      
     <span class="caret"></span>
@@ -470,7 +477,7 @@ div.tocify {
 <li><p>Start RStudio. It will detect your installation of R, and you should see a screen like this:</p></li>
 </ol>
 <div class="figure">
-<img src="rstudio.png" alt="" />
+<img src="./rstudio.png" alt="" />
 <p class="caption">Figure: RStudio Window</p>
 </div>
 <p>On the left is the console window, where you type commands and see output. The windows on the right hold various useful tabs, here the top pane is showing the data I happen to currently have loaded in my environment (yours will initially be empty) and a viewer showing part of my filesystem at the bottom. These right-hand windows can also show graphs, help files, and your command history.</p>
@@ -846,15 +853,18 @@ names(TreeData)</code></pre>
 <p>Once we have our data tidied and loaded into a data frame, we can access each variable as a vector and work on it exactly as we did in the section on vectors above.</p>
 <p>We can access the individual vectors using the <code>$</code> accessor operator:</p>
 <pre class="r"><code>TreeData$height</code></pre>
-<pre><code>##   [1]  5.6  5.8  4.9  4.0  5.6  5.3  5.5  6.9  4.8  4.8  4.5  4.9  6.7  7.0  7.7  7.0  5.8  5.4  3.1  3.6  5.8  4.0
-##  [23]  3.2  3.2  3.3  2.1  2.8  8.8  7.3  8.6  3.5  7.8  6.8  7.1  6.8  6.9 12.2 11.9 11.9 11.6 10.7 12.2 11.2 11.7
-##  [45] 10.5  3.8  5.0  4.6  3.7  4.7  4.6  5.3  3.8  3.5  5.5  5.1  4.1  4.0  5.4  5.2  5.5  5.0  4.9  0.7  3.1  1.9
-##  [67]  2.9  2.4  3.5  1.6  2.3  3.1  8.8  5.9  8.5  4.1  8.9  9.1  5.8  8.4  6.4 10.2 10.4  6.2 10.6 10.6 10.8  9.2
-##  [89]  8.6  9.8  6.9  5.9  5.7  5.2  5.1  7.2  4.8  4.9  7.7  7.9  6.8  7.8  6.9  7.6  4.8  6.9  5.5  8.1  4.4  4.6
-## [111]  4.2  2.5  4.9  4.4  2.8  4.5  2.7  9.4 10.0  7.0  8.5  8.6  6.5 11.1 10.2  8.9 14.8 12.4 11.4 14.1 10.0  9.9
-## [133]  9.5 12.6 11.7  4.1  3.8  6.7  6.3  5.5  5.5  5.4  6.1  6.0  6.6  8.1  6.0  6.4  7.7  6.3  6.4  7.9  6.6  5.2
-## [155]  4.9  3.3  4.2  4.1  4.4  4.4  3.5  4.3 11.3  9.2  8.4  9.9  6.2  9.5 10.3  8.8  9.7 10.5 12.8 12.9 11.8 13.5
-## [177] 11.0  9.4 13.0 14.5</code></pre>
+<pre><code>##   [1]  5.6  5.8  4.9  4.0  5.6  5.3  5.5  6.9  4.8  4.8  4.5  4.9  6.7  7.0  7.7
+##  [16]  7.0  5.8  5.4  3.1  3.6  5.8  4.0  3.2  3.2  3.3  2.1  2.8  8.8  7.3  8.6
+##  [31]  3.5  7.8  6.8  7.1  6.8  6.9 12.2 11.9 11.9 11.6 10.7 12.2 11.2 11.7 10.5
+##  [46]  3.8  5.0  4.6  3.7  4.7  4.6  5.3  3.8  3.5  5.5  5.1  4.1  4.0  5.4  5.2
+##  [61]  5.5  5.0  4.9  0.7  3.1  1.9  2.9  2.4  3.5  1.6  2.3  3.1  8.8  5.9  8.5
+##  [76]  4.1  8.9  9.1  5.8  8.4  6.4 10.2 10.4  6.2 10.6 10.6 10.8  9.2  8.6  9.8
+##  [91]  6.9  5.9  5.7  5.2  5.1  7.2  4.8  4.9  7.7  7.9  6.8  7.8  6.9  7.6  4.8
+## [106]  6.9  5.5  8.1  4.4  4.6  4.2  2.5  4.9  4.4  2.8  4.5  2.7  9.4 10.0  7.0
+## [121]  8.5  8.6  6.5 11.1 10.2  8.9 14.8 12.4 11.4 14.1 10.0  9.9  9.5 12.6 11.7
+## [136]  4.1  3.8  6.7  6.3  5.5  5.5  5.4  6.1  6.0  6.6  8.1  6.0  6.4  7.7  6.3
+## [151]  6.4  7.9  6.6  5.2  4.9  3.3  4.2  4.1  4.4  4.4  3.5  4.3 11.3  9.2  8.4
+## [166]  9.9  6.2  9.5 10.3  8.8  9.7 10.5 12.8 12.9 11.8 13.5 11.0  9.4 13.0 14.5</code></pre>
 <p>(see <a href="https://www.r-bloggers.com/2009/10/r-accessors-explained/" class="uri">https://www.r-bloggers.com/2009/10/r-accessors-explained/</a> for more details r accessor functions)</p>
 <p>This is just a vector, so we can use any of the functions for vectors to summarise this variable. Try:</p>
 <pre class="r"><code>mean(TreeData$height)</code></pre>
@@ -899,8 +909,10 @@ names(TreeData)</code></pre>
 <p>For a categorical variable, a summary of frequency counts might be the most appropriate descriptive statistic. We can get this with the <code>table()</code> function. Suppose we wanted to know the distribution of species in our dataset.</p>
 <pre class="r"><code>table(TreeData$species.name)</code></pre>
 <pre><code>## 
-##    A. aulococarpa    A. polystachya C. cunninghamiana        E. pellita    M. viridiflora 
-##                36                36                36                36                36</code></pre>
+##    A. aulococarpa    A. polystachya C. cunninghamiana        E. pellita 
+##                36                36                36                36 
+##    M. viridiflora 
+##                36</code></pre>
 <p>The ‘table’ function can also generate cross-tabs, by specifying two or three variables. Note here how they are defined using the accessor operator. <code>table()</code> does not use the forumula interface we discussed above, although the sister function <code>xtabs()</code> does.</p>
 <pre class="r"><code>table(TreeData$species.name, TreeData$health)</code></pre>
 <pre><code>##                    
@@ -946,8 +958,10 @@ round(proptab1, digits=2)</code></pre>
 <pre class="r"><code>proptab1[1,1] # get the element on the first row and first column</code></pre>
 <pre><code>## [1] 0.1944444</code></pre>
 <pre class="r"><code>proptab1[,2] # this returns the second column only.</code></pre>
-<pre><code>##    A. aulococarpa    A. polystachya C. cunninghamiana        E. pellita    M. viridiflora 
-##         0.8055556         0.5277778         0.7500000         0.8888889         0.9444444</code></pre>
+<pre><code>##    A. aulococarpa    A. polystachya C. cunninghamiana        E. pellita 
+##         0.8055556         0.5277778         0.7500000         0.8888889 
+##    M. viridiflora 
+##         0.9444444</code></pre>
 <pre class="r"><code>proptab1[4,] # return the fourth row only</code></pre>
 <pre><code>##         N         Y 
 ## 0.1111111 0.8888889</code></pre>
