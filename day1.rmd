@@ -50,7 +50,7 @@ Powerpoint slides for each day's lectures are here:
 
 * [Day 1 slides](./rStatsMar22.pptx)
 * [Day 2 slides](./day2_tidydata.pptx)
-* [Day 3 slides](./day3.pptx.pptx)
+* [Day 3 slides](./day3.pptx)
 
 `r subsection("Learning objectives")` 
 
@@ -113,7 +113,7 @@ The great strength of R is in its contributed packages, these are community writ
 
 3. Start RStudio.  It will detect your installation of R, and you should see a screen like this:
 
-![Figure:  RStudio Window](images/rstudio.png)
+![Figure:  RStudio Window](./rstudio.png)
 
 On the left is the console window, where you type commands and see output.  The windows on the right hold various useful tabs, here the top pane is showing the data I happen to currently have loaded in my environment (yours will initially be empty) and a viewer showing part of my filesystem at the bottom.  These right-hand windows can also show graphs, help files, and your command history.
 

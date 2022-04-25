@@ -11,9 +11,10 @@ output:
 # Limitations of "base" R
 
 With only base R (that is, R without add on packages) it can be unexpectedly difficult to perform some simple tasks.
-A good example is making a table of summary statistics.  This is difficult with base R but simple with some help from add-on packages. 
 
-Unfortunately there are lots of different options for this, each with its own learning curve, merits and problems.  So rather than invest in teaching one approach that you might or might not find useful, I will very briefly illustrate three possible approaches.
+A good example is making a table of summary statistics.  This is difficult with base R but is simple with using function from add-on packages. 
+
+Here I illustrate this using two widely used systems for data manipulation in R, namely `data.table` and `tidyverse`.  Finally I illustrate a new package, `gtsummary` that is specifically designed for creation of publication ready summary tables.
 
 # Mean of one variable stratified by another
 
@@ -26,20 +27,21 @@ First let's make a fake dataset.  We'll assume women have an average height of 1
 sex = sample(c("Male", "Female"), size=100, replace=TRUE)
 
 # What does this line do?
-height = rnorm(n=100, mean=180 + 10* (sex=="Male"), sd=10)
+height = rnorm(n=100, 
+               mean=180 + 10* (sex=="Male"), 
+               sd=10)
 
 # We have two vectors of the same length so we can combine them into a data frame.
 dat <- data.frame(height,sex)
+
 ```
 
-
-Now lets quickly check the data looks OK.
+Now lets quickly check the data using a plot to make sure it looks as we would expect.
 
 ```{r }
 head(dat)
 boxplot(dat$height~dat$sex)
 ```
-
 
 
 # The base R way to get summary statistics
@@ -145,5 +147,7 @@ tbl_summary(dat, by=sex, statistic=list(height~"{mean} ({sd})"))
 
 `data.table` and `tidyverse` perform a lot of the same tasks in improving the `R` experience.  You will probably choose to mainly use one or the other (or to mostly stick with base R), but it will help to be familiar with both if you want to understand and reuse code written by others.   
 
-If you search `tidyverse` vs `data.table` online you will find a lot of differing opinions as to which to use.  More people learn `tidyverse` now, possibly because it has a lot of resources put into its development and promotion.  Personally I like the `data.table` syntax better so I tend to use this, borrowing from `tidyverse` packages when I need to.  I find that the more confident I get with it, the more `data.table` features I use, which I think improves my code.
+If you search `tidyverse` vs `data.table` online you will find a lot of differing opinions as to which to use.  More people learn `tidyverse` now, possibly because it has a lot of resources put into its development and promotion.  Personally I like the `data.table` syntax better so I tend to use this, borrowing from `tidyverse` packages when I need to.  
+
+I find that the more confident I get with it, the more `data.table` features I use, which I think improves my code.
 

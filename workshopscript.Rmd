@@ -4,6 +4,7 @@
 title: 'JIC MSc Workshop: Analysis Walkthrough'
 author: "George Savva"
 date: "March 2022"
+output: word_document
 ---
 
 

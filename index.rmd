@@ -20,3 +20,7 @@ This site hosts my various course notes, presentations and data files accompanyi
     * [Tutorial](/workshopscript.html)
 * Statistics notes
     * [Don't dichotomise your data](./dichot.html)
+* Notes on using R
+    * [Tidyverse, data.table and others for making descriptive tables](./datatabletidyverse.Rmd)
+    
+    
