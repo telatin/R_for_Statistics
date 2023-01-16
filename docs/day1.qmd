@@ -274,6 +274,8 @@ x |> log() |> sqrt()
 
 ```
 
+Hint:  it might help to understand if you read the pipe operator `|>` as "and then..."
+
 To see the *class* of an object (what kind of thing is stored in the object), use the `class()` function.
 
 ```{r eval=FALSE }
@@ -301,7 +303,7 @@ What is the class of the ‘myname’ object?
 
 We can R as a calculator like this but we'll most often be using R to analyse datasets.
 
-Later we'll look into getting real data into R, but for now we'll work on a built-in dataset to understand how to run basic analyses.  Type:
+Later we'll look into getting real data into R from Excel files, but for now we'll work on a built-in dataset to understand how data is stored and to run analyses.  Type:
 
 ```{r }
 data(iris)
@@ -368,7 +370,25 @@ with(iris , cor(Sepal.Length , Sepal.Width))
 2. What is the class of each of its columns?
 3. What is the mean sepal length of the flowers
 4. What is the smallest (minimum) sepal width
-5. (Difficult) How many `viriginca` flowers are included in the dataset?
+5. (Difficult) How many `viriginca` flowers are included in the dataset?  Can you tabulate the `species` variable?
+
+## Other packages for descriptive statistics
+
+(If you get time) `Base` R does not have good functions for making descriptive tables and graphs.  But there are many other packages that have been developed to help with this.  In particular the `gt` system is very good for making tables, and the `GGally` package has a nice function for making pairs plots.  You could install these packages and try them out:
+
+```{r eval=FALSE}
+install.packages("gtsummary")
+gtsummary::tbl_summary(iris)
+```
+
+Can you stratify the table by species?
+
+```{r eval=FALSE}
+install.packages("GGally")
+GGally::ggpairs(iris)
+```
+
+Compare this to the output from the 'base' function `pairs(iris)` 
 
 # Tidyverse
 
@@ -384,7 +404,9 @@ Tidyverse is in fact a large collection of packages.  You can see all of the det
 * **ggplot2** for making graphics
 * **broom** for organising analysis results
 
-If you do not have the tidyverse installed, then install them now from the menu or by using
+Check if you have `tidyverse` installed on the computer you are using.  Use the `packages` pane in the bottom right hand section of the screen and search for `tidyverse`.  If it is installed you will see a corresponding line in the `packages` pane with the current installed version number.
+
+If you do not have the tidyverse installed, then install it now from the menu or by using
 
 ```{r eval=FALSE}
 install.packages("tidyverse")
@@ -392,7 +414,7 @@ install.packages("tidyverse")
 
 This will install a lot of packages and might take a few minutes.
 
-Once the tidyverse packages are installed you can use all of their functions.  There are two ways to use functions installed as part of a package.  For example, to use the `glimpse` function from the `dplyr` package to look at the iris dataset, you can type:
+Once the tidyverse packages are installed you can use all of their functions.  There are two ways to use functions installed as part of a package.  For example, to use the `glimpse` function from the `dplyr` package to look at the `iris` dataset, you can type:
 
 ```{r eval=FALSE}
 dplyr::glimpse(iris)
@@ -467,7 +489,7 @@ boxplot(Petal.Length ~ Species, data=iris)
 ```
 
 :::{callout-note}
-Although this `boxplot` function isn't very useful, note the syntax 
+Although this `boxplot` function isn't very useful, note the `~` syntax as this is used widely elsewhere.
 :::
 
 The ggplot() system is much more flexible, and produces publication quality outputs:
@@ -483,6 +505,97 @@ iris |> ggplot() +
 ```
 
 We'll see more ggplot in later sessions, but note the syntax, in partidular how a dataset is passed to the ggplot function, how we specify the linkage between the data and the plot, and how different elements are added to make the plot.
+
+
+
+# Hypothesis tests and linear models
+
+Does petal length depend on species?  We can generate a simple box plot as previously to explore this question:
+
+```{r }
+ggplot(data=iris, aes(x=Species, y=Petal.Length, fill=Species)) + 
+  geom_boxplot() + 
+  labs(x="Species", y="Petal Length") + 
+  theme_bw()
+```
+
+It looks like the two variables are related,  but we would like to perform a hypothesis test to see if the difference is statistically significant, and to get an estimate (with confidence interval) for the difference.
+
+To get the coefficients (mean differences between groups) we can estimate a linear model:
+
+```{r }
+model1 <- lm( Sepal.Length ~ Species, data=iris)
+```
+
+When you estimate a model R will not display any output, it is all stored in the model object that is created.  Then you can access whatever output you want using other functions, eg:
+
+```{r }
+summary(model1)
+anova(model1)
+```
+
+You can use either the base function `confint` or the `tidy` function from the `broom` package (`broom` is installed with `tidyverse`) to get the confidence intervals for the mean differences:
+
+```{r }
+# Base R methods:
+confint(model1)
+
+# Tidyverse method:
+broom::tidy(model1, conf.int=TRUE)
+```
+
+::: {.callout-note}
+Note - you can run t-tests like this, since a t-test is equivalent to a linear model with two group categorical predictor.
+:::
+
+All pairwise comparisons using `emmeans` or t-tests for individual pairs with `filter` then `lm`?
+
+### More complex models
+
+Now. suppose we want to fit a more complex model, whereby sepal length depends on petal length, with the relationship allowed to vary by species.
+
+```{r }
+
+# First make a model with Sepal.Length depending on Species and Petal.Length
+model2 <- lm( Sepal.Length ~ Species + Petal.Length, data=iris)
+summary(model2)
+
+# Now add the interaction term.  These two models are the same.
+model3 <- lm( Sepal.Length ~ Species + Petal.Length + Species:Petal.Length, data=iris)
+model3 <- lm( Sepal.Length ~ Species * Petal.Length, data=iris)
+summary(model3)
+
+```
+
+We can use `augment` from the `broom` package to add predicted values to our dataset, with confidence intervals.  
+
+```{r }
+# look carefully at the output from here:
+library(broom)
+model3 |> augment(interval="confidence")
+```
+
+Finally we can use ggplot to show these predicted values and confidence intervals.  Take care to understand how the output from each function (ie `lm`, `augment`) is piped into the next.
+
+```{r }
+
+
+lm( Sepal.Length ~ Species * Petal.Length, data=iris) |>
+  augment(interval="confidence") |> 
+  ggplot() + 
+    aes(x=Petal.Length, y=Sepal.Length, color=Species) + 
+    geom_ribbon(aes(y=.fitted,ymin=.lower, ymax=.upper), alpha=0.1) + 
+    geom_point() + 
+    geom_line(aes(y=.fitted),lwd=1) + 
+    theme_bw()
+
+# Try changing the forumula to `Sepal.Length ~ Species + Petal.Length`
+# Which model has the better fit? (you can use anova(model2, model3) to compare models)
+
+
+```
+
+
 
 # Types and classes
 
@@ -558,17 +671,17 @@ Note the difference between `NA` (a missing value) and `"NA"` (a character strin
 Try some other functions with myvector to see what impact the missing data point has.
 
 ```{r eval=FALSE}
-class(myvector)
+class(weights)
 
-plot(myvector)
+plot(weights)
 
 weights>20
 
-mean(myvector) # what happens here?  Why?  Can you fix it?
+mean(weights) # what happens here?  Why?  Can you fix it?
 
-is.na(myvector) # what does this do?
+is.na(weights) # what does this do?
 
-sum(is.na(myvector)) # can you explain what this does?
+sum(is.na(weights)) # can you explain what this does?
 ```
 
 # More descriptive statistics
@@ -665,69 +778,4 @@ table(iris$Species, iris$PetalLengthGrouped) |>
   round(digits=2)
 ```
 
-
-# Hypothesis tests and linear models
-
-Does petal length depend on species?  We can generate a simple box plot as previously to explore this question:
-
-```{r }
-ggplot(data=iris, aes(x=Species, y=Petal.Length, fill=Species)) + 
-  geom_boxplot() + 
-  labs(x="Species", y="Petal Length") + 
-  theme_dark() + 
-  scale_fill_brewer()
-```
-
-It looks like the two variables are related,  but we would like to perform a hypothesis test to see if the difference is statistically significant, and to get an estimate (with confidence interval) for the difference.
-
-To get the coefficients (mean differences between groups) we can estimate a linear model:
-
-```{r }
-model1 <- lm( Sepal.Length ~ Species, data=iris)
-summary(model1)
-anova(model1)
-```
-
-Then use either the base function `confint` or the `tidy` function from the `broom` package (`broom` is installed with `tidyverse`) to get the confidence intervals for those differences:
-
-```{r }
-# Base R methods:
-confint(model1)
-
-# Tidyverse method:
-broom::tidy(model1, conf.int=TRUE)
-```
-
-Suppose we want to fit a more complex model, whereby sepal length depends on petal length, with the relationship allowed to vary by species.
-
-```{r }
-model2 <- lm( Sepal.Length ~ Species * Petal.Length, data=iris)
-summary(model2)
-
-```
-
-We can use `augment` from the `broom` package to add predicted values to our dataset, with confidence intervals.  
-
-```{r }
-
-library(broom)
-model2 |> augment(interval="confidence")
-```
-
-Finally we can use ggplot to show these predicted values and confidence intervals:
-
-
-```{r }
-
-lm( Sepal.Length ~ Species * Petal.Length, data=iris) |>
-  augment(interval="confidence") |> 
-  ggplot() + 
-    aes(x=Petal.Length, y=Sepal.Length, color=Species) + 
-    geom_ribbon(aes(y=.fitted,ymin=.lower, ymax=.upper), alpha=0.1) + 
-    geom_point() + 
-    geom_line(aes(y=.fitted),lwd=1) + 
-    theme_bw()
-```
-
-
-
+You might decide that using a function like `gtsummary::tbl_summary()` is easier!
