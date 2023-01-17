@@ -8,7 +8,7 @@ format:
   html:
     theme: cosmo
     toc: true
-    toc-depth: 2
+    toc-depth: 1
     self-contained: true
     smooth-scroll: true
     number-sections: false
@@ -37,7 +37,9 @@ We have recorded:
 Our research questions are:
 
 * Does the treatment improve walking speed compared to controls?
-* By how much, and how certain are we of this?
+* By how much does it improve, and how certain are we of this?
+
+The dataset can be found at [walkingspeed_day2.xlsx](./walkingspeed_day2.xlsx)
 
 # Using `readxl` to read data from Excel files
 
@@ -57,21 +59,23 @@ Whatever the format your raw data there is likely to be a package to read it int
 
 Here we will import a dataset from Excel using the `readxl` package.  If you already installed `tidyverse` then you already have this package.  
 
-Now we have the function `readxl::read_excel()` available, which reads data from an excel file.
+Once the library is installed we can use the function `readxl::read_excel()`, which reads data from an excel file.
 
 ## **Step 1** - Make sure the data looks OK and is in the right place on your computer
 
-Before we dive in and use it, we need to make sure our data is in a sensible place.
+Before we dive in and import it, we need to make sure our data is in a sensible place.
 
 1. Open RStudio and switch to the project you created in day 1, or start a new project if necessary.
 
-2. Then, save the example data (`walkingspeed.xlsx`) for this tutorial into your project folder.
+2. Then, save the example data [`walkingspeed_day2.xlsx`](`walkingspeed_day2.xlsx`) for this tutorial into your project folder.  Check that it has appeared in the 'files' pane in RStudio.
 
-3. Open the dataset in Excel and explore the file so that you understand what is there.
+3. Start a new script file that will eventually include all of the commands we need to import, clean, visualise and analyse the data.
+
+4. Now open the dataset in Excel and explore the file so that you understand what is there.
 
 ## Read the help!
 
-We are nearly ready to import some data.  But before using a new function its always good to read its documentation.
+We are nearly ready to import our data.  But before using a new function its always good to read its documentation.
 
 R and R packages are not as self-explanatory as other software, and so you should expect to spend a fair amount of time, particularly as you are learning R, reading documentation, vignettes, blogs, etc on what R can do, which packages exist, and how to use them.
 
@@ -112,11 +116,21 @@ We could have set the range of the data in the spreadsheet (I usually do this fo
 
 Now you should have a ‘data frame’ object called `walkingdat` in your environment, which includes the data from the Excel sheet ready to process and analyse.
 
+Our workflow now is:
+
+1. Clean and code
+2. Visualise
+3. Describe
+4. Model
+5. Diagnose model
+6. Interpret
+
+
 # Cleaning
 
-Before we can analyse our data we should check that it looks OK.
+Before we can analyse our data we should check each variable to make sure that it looks OK.
 
-We'll use functions from day 1 to explore the content and structure of the walkingspeed dataset, and the distributions of the main variables.
+We'll use functions from day 1 to explore the content and structure of the dataset, and the distributions of the main variables.  We can then address any problems that we find.
 
 Recall these functions from the day 1 notes.  We are checking that the variables have the correct type, and the distributions of the categorical variables.  
 
@@ -132,28 +146,50 @@ table(walkingdat$sex)
 table(walkingdat$department)
 ```
 
-You will have noticed that the two numerical variables, age and walking time, have been loaded as character variables and not numerics.
+You will have noticed that one of the numerical variables, age, has been loaded as character variable and not a numeric.  We cannot do anaysis with a character variable!
 
-Why do you think this is?
+Why do you think the variable is imported as character and not numeric?
 
-We can convert them to numerics using `as.numeric`, then use simple histograms and summaries to check on their range.
+We can convert age to a numeric using `as.numeric`.
 
 ```{r }
-# This is all the cleaning that is needed.
+# Tidyverse version:
 walkingdat <- walkingdat |> mutate(age = as.numeric(age))
-walkingdat <- walkingdat |> mutate(time = as.numeric(time))
+
+# Base R version:
+walkingdat$age <- as.numeric(walkingdat$age)
+```
+
+What warning message did you get when you converted this variable?  What does it mean?
+
+
+How might we check on the age and time variables to see if the distribution looks OK?
+
+We could make some descriptive statistics and basic plots!
+
+```{r }
 hist(walkingdat$age)
 hist(walkingdat$time)
-
+range(walkingdat$time, na.rm=TRUE)
 range(walkingdat$time, na.rm = TRUE)
 
 ```
 
-It looks like there are some unreasonably high and low values of walking time.  Make another graph of walking speed against age to see what is going on.
+
+## Dealing with outliers
+
+It looks like there are some unreasonably high and low values of walking time.  
+
+We can make another graph of walking speed against age, this time on a logarithmic scale so both the extreme high and extreme low points are visible, to see what is going on.
 
 ```{r }
+
+## ggplot2 version
 library(ggplot2)
 ggplot(walkingdat) + aes(x=age, y=time) + geom_point() + scale_y_log10()
+
+## base R version
+plot(walkingdat$age, walkingdat$time, log="y")
 ```
 
 It seems there are some values for time that are likely to be technical errors.  We can remove these values (set them to missing) in a few different ways:
@@ -167,95 +203,78 @@ walkingdat$time[walkingdat$time>100] <- NA
 walkingdat <- walkingdat |> mutate(time = ifelse(time<0.1,NA,time))
 walkingdat <- walkingdat |> mutate(time = ifelse(time>100,NA,time))
 
-## the pure tidyverse way with case_when is a bit clunky.
-walkingdat <- walkingdat |> mutate( time = case_when(time<0.1 ~ NA_real_ , time>100 ~ NA_real_, TRUE ~ time) )
+## the 'pure' tidyverse way with case_when is a bit clunky.
+## look up 'case_when()' to understand this line
+walkingdat <- walkingdat |> mutate( time = case_when(time<0.1 ~ NA_real_ , 
+                                                     time>100 ~ NA_real_, 
+                                                     TRUE ~ time) )
 
 # Now check the distribution of time again.
 hist(walkingdat$time, breaks=100)
 range(walkingdat$time, na.rm = TRUE)
 
-
 ```
 
-Now we have a cleaned dataset in our environment we can proceed with our analysis.
+Now we have a cleaned dataset in our environment we can proceed with our visualisation and analysis:
 
 # Exercises
 
-Solutions are posted at the bottom of the page, but it will help you a lot to try to answer them on your own, by discussing with colleagues, or by looking up help online before using the solutions.
+Add commands to your script file to answer the following questions.  Add comments (lines beginning with `#` to help you remember what you did and why!).
+
+Some solutions are posted at the bottom of the page, but it will help you a lot to try to answer them on your own, by discussing with colleagues, or by looking up help online before using the solutions.
 
 If you don't understand the given solution, then please ask and we can go through it in the class.
 
+We will discuss the testing, modelling and graphing elements in more detail on day 3, but it would be helpful to attempt these today.
+
+1. Structure of the dataset
+    a. What are the names of the variables that comprise the `walkingdata` dataframe?
+    a. What is the class of each?
+    a. How many columns and rows does it have?
+
+1. Descriptive statistics
+    a. What is the age of youngest patient? 
+    a. What is the age of the oldest patient? 
+    a. Are the oldest and youngest patient male or female?
+
+1. Cross-tabulation
+    a. How many Male and Female patients are there?
+    a. Is the sex ratio balanced between treatment groups?
+    a. How many women are there of age under 50? How many men are there of age under 50?
+
+1.  Descriptive statistics using a subset of the data
+    a. What is the average walking speed for men between 50 and 60 years of age?
+
+1.  Deriving new variables
+    a. Create a new column that will have the speed of walking, that is 1/time.
+    a. Create a new column that will have the time rounded up to nearest 10th of a second.
+
+1.  Graphing
+    a. Consider what kind of graph you might make to illustrate the difference in walking speed between treatment groups, and try to make it using ggplot. Eg:
+    a. Make a scatter plot of time vs age
+    a. Make the colour of each point reflect the treatment group
+    a. Make a box plot of time by sex, with a different coloured box per sex
+    a. Label the axes appropriately
+    a. Try a violin plot instead of a boxplot (with geom_violin).  Which do you prefer?
+    a. Make any other adjustments you think are informative!
+
+1.  Hypothesis Testing
+    a. What is the difference in average walking speed between control patients and treated patients?
+    a. Is this difference statistically significant? Use t-test `t.test()` and Mann-Whitney tests `wilcox.test()` to examine the differences between the groups.  Look up the syntax for t.test() and wilcos.test() using the help system, and use them to check whether the time taken to complete the task varies by treatment status.  In each case use the version of the function that takes a `formula` agument. Remember the `formula` syntax from the `boxplot` and `lm` functions in day 1.
+    a. Compare the p-values for each method.
+    a. Consider the assumptions for a t-test, and whether they are met in this dataset.  
+    a. Do you believe that treatment affects walking speed?
+
+
+# Solutions
+
+The exercises will have many possible solutions, under each exercise we have listed a few possible answers.  Most are possible using the functions we have introduced in day 1 of the course, or with functions I suggest in the questions, but in some cases there are other solutions that I have given using different functions/packages.
+
+If you answered the questions another way then that's fine, but do try to understand how the given solutions work.
+
 ### Structure of the dataset
 
-#. What are the names of the variables that comprise the `walkingdata` dataframe?
-
-#. What is the class of each?
-
-#. How many columns and rows does it have?
-
-### Descriptive statistics
-
-#. What is the age of youngest patient? 
-
-#. What is the age of the oldest patient? 
-
-#. Are the oldest and youngest patient male or female?
-
-## Cross-tabulation
-
-#. How many Male and Female patient are there?
-
-#. Is the sex ratio balanced between treatment groups?
-
-#. How many women are there of age under 50? How many men are there of age under 50?
-
-## Descriptive statistics using a subset of the data
-
-#. What is the average walking speed for men between 50 and 60 years of age?
-
-## Deriving new variables
-
-#. Create a new column that will have the speed of walking, that is 1/time.
-
-#. Create a new column that will have the time rounded up to nearest 10th of a second.
-
-## Graphing
-
-#. Consider what kind of graph you might make to illustrate the difference in walking speed between treatment groups, and try to make it using ggplot.
-
-# 1.
-# Make a scatter plot of time vs age
-# Make the colour of each point reflect the treatment group
-
-# 2.
-# Make a box plot of time by sex, with a different coloured box per sex
-# Label the axes appropriately
-# Try a violin plot instead of a boxplot (with geom_violin).  Which do you prefer?
-# Make any other adjustments you think are informative!
-
-
-## Testing and modelling (optional)
-
-This will be covered in day 3 but you can think about these questions if you have time.
-
-#. What is the difference in average walking speed between control patients and treated patients?
-
-#. Is this difference statistically significant?
-
-#. Use t-test `t.test()` and Mann-Whitney tests `wilcox.test()` to examine the differences between the groups.
-
-#. Consider the assumptions underlying the t-test, and whether they are met in this dataset.  
-
-#. Do you believe that treatment affects walking speed?
-
-
-## Solutions
-
-The exercises will have many possible solutions, under each exercise we have listed a few possible answers.  All are possible using the functions we have introduced in day 1 of the course, but in some cases there are other solutions that I have given using different functions/packages.
-
-If you did it another way then that's fine, but try to understand how the given solutions work.
-
-#. What are the names of the variables that comprise the `walkingdat` dataframe?
+*What are the names of the variables that comprise the `walkingdat` dataframe?*
 
 ```{r }
 library(tidyverse)
@@ -266,7 +285,7 @@ names(walkingdat)
 summary(walkingdat)
 ```
 
-#. What is the class of each?  What is the class of `walkingdat`?
+*What is the class of each?  What is the class of `walkingdat`?*
 
 ```{r }
 str(walkingdat)
@@ -286,34 +305,35 @@ nrow(walkingdat) # Get the number of rows
 length(walkingdat) # The 'length' of a data frame is the numve
 ```
 
-## Descriptive statistics
+### Descriptive statistics
 
-#. What is the age of youngest patient? 
+*What is the age of youngest patient?*
 
 ```{r }
+# look at the help for what na.rm does.  You'll see many of the summary statistics need this.
+min(walkingdat$age, na.rm=TRUE)
+walkingdat |> summarize(min(age, na.rm=TRUE))
 
-min(walkingdat$age)
-
-walkingdat |> summarize(min(age))
-
-walkingdat |> select(age) |> min()
+walkingdat |> select(age) |> min(na.rm=TRUE)
 ```
-#. What is the age of the oldest patient? 
+
+*What is the age of the oldest patient?*
 
 ```{r }
 
 max(walkingdat$age)
 
-walkingdat |> summarize(max(age))
+walkingdat |> summarize(max(age, na.rm=TRUE))
 
-walkingdat |> select(age) |> max()
+walkingdat |> select(age) |> max(na.rm=TRUE)
 
-range(walkingdat$age)
+range(walkingdat$age, na.rm=TRUE)
 
 summary(walkingdat)
 
 ```
-#. Are the oldest and youngest patient male or female?
+
+*Are the oldest and youngest patient male or female?*
 
 ```{r }
 walkingdat |> filter(age==47)
@@ -325,9 +345,9 @@ walkingdat[which.min(walkingdat$age), "sex"]
 
 ```
 
-## Cross-tabulation
+### Cross-tabulation
 
-#. How many Male and Female patient are there?
+*How many Male and Female patient are there?*
 
 ```{r }
 walkingdat |> filter( sex =='F' ) |> count()
@@ -339,7 +359,7 @@ walkingdat |> group_by(sex) |> count()
 
 ```
 
-#. Is the sex ratio balanced between treatment groups?
+*Is the sex ratio balanced between treatment groups?*
 
 ```{r }
 walkingdat |> filter( group =='treat', sex =='M' ) |> count()
@@ -347,7 +367,7 @@ walkingdat |> filter( group =='treat', sex =='F' ) |> count()
 
 ```
 
-#. How many women are there of age under 50? How many men are there of age under 50?
+*How many women are there of age under 50? How many men are there of age under 50?*
 
 ```{r }
 walkingdat |> filter(age < 50 , sex =='F' ) |>  count()
@@ -357,74 +377,88 @@ table(walkingdat$sex, walkingdat$age<50)
 
 ```
 
-## Descriptive statistics using a subset of the data
+### Descriptive statistics using a subset of the data
 
-#. What is the average walking speed for men between 60 and 70 years of age?
+*What is the average walking speed for men between 60 and 70 years of age?*
 
 ```{r }
-walkingdat |> filter(age >59, age <71,  sex =='M' )  |> select(time) |> pull() |> mean()
+walkingdat |> filter(age >59, age <71,  sex =='M' )  |> 
+  select(time) |> pull() |> mean()
 
-walkingdat |> filter( age >59, age <71,  sex =='M' ) |> summarise(mean(time))
+walkingdat |> filter( age >59, age <71,  sex =='M' ) |> 
+  summarise(mean(time))
 
 ```
 
-## Deriving new variables
 
-#. Create a new column that will have the speed of walking, that is 1/time.
+### Deriving new variables
+
+*Create a new column that will have the speed of walking, that is 1/time.*
 
 ```{r }
 walkingdat <- walkingdat |> mutate(speed=1/as.numeric(time))
 
 ```
 
-#. Create a new column that will have the time rounded up to nearest 10th of a second.
+*Create a new column that will have the time rounded to the nearest 10th of a second.*
 
 ```{r }
 walkingdat <- walkingdat |> mutate(rounded=round(as.numeric(time), digits = 2))
 
 ```
 
-## Graphing
+### Graphing
 
-#. Consider what kind of graph you might make to illustrate the difference in walking speed between treatment groups, and try to make it using ggplot.
+*Consider what kind of graph you might make to illustrate the difference in walking speed between treatment groups, and try to make it using ggplot.*
 
-# 1.
-# Make a scatter plot of time vs age
-# Make the colour of each point reflect the treatment group
-
-```{r }
-ggplot(data=walkingdat) + aes(x=age,y=time,colour=group) + geom_point()
-```
-
-# 2.
-# Make a box plot of time by sex, with a different coloured box per sex
-# Label the axes appropriately
-# Try a violin plot instead of a boxplot (with geom_violin).  Which do you prefer?
-# Make any other adjustments you think are informative!
+*Make a scatter plot of time vs age*
+*Make the colour of each point reflect the treatment group*
 
 ```{r }
-ggplot(data=walkingdat) + aes(x=sex,y=time,colour=sex) + geom_boxplot()
+ggplot(data=walkingdat) +
+  aes(x=age,y=time,colour=group) + 
+  geom_point()
 ```
 
-## Testing and modelling
+*Make a box plot of time by sex, with a different coloured box per sex*
 
-#. What is the difference in average walking speed between control patients and treated patients?
+```{r }
+ggplot(data=walkingdat) +
+  aes(x=sex,y=time,fill=sex) + 
+  geom_boxplot()
+```
+
+*Label the axes appropriately*
+
+ggplot(data=walkingdat) +
+  aes(x=sex,y=time,fill=sex) + 
+  geom_boxplot() + 
+  labs(x="Sex", y="Time to complete task (s)")
+
+*Try a violin plot instead of a boxplot (with geom_violin).  Which do you prefer?*
+*Make any other adjustments you think are informative!*
+
+
+
+### Hypothesis testing
+
+*What is the difference in task completion time between control patients and treated patients?*
 
 ```{r }
 lm( time ~ group , data=walkingdat) |> broom::tidy()
+
 lm( time ~ group , data=walkingdat) |> summary()
 
 ```
 
-#. Is this difference statistically significant?
+*Is this difference statistically significant?*
 
 ```{r }
 lm( time ~ group , data=walkingdat) |> anova()
 
 ```
 
-
-#. Use t-test `t.test()` and Mann-Whitney tests `wilcox.test()` to examine the differences between the groups.
+*Use t-test `t.test()` and Mann-Whitney tests `wilcox.test()` to examine the differences between the groups.*
 
 ```{r }
 t.test( time ~ group , data=walkingdat)
@@ -432,8 +466,12 @@ wilcox.test( time ~ group , data=walkingdat)
 
 ```
 
+*. Consider the assumptions underlying the t-test, and whether they are met in this dataset*
 
-#. Consider the assumptions underlying the t-test, and whether they are met in this dataset.  
+The t-test and the linear model assume that the outcome variable is normally distributed within groups, which is not the case here.  So the results from these is probably wrong.
 
-#. Do you believe that treatment affects walking speed?
+The Mann-Whitney test (Wilcox test) does not make this assumption, and is more robust in this case.
 
+*Do you believe that treatment affects walking speed?*
+
+*Try the t-test or linear model using the speed variable that you created instead of the time variable that is in the dataset.*
