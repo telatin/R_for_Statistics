@@ -61,7 +61,7 @@ Here we will import a dataset from Excel using the `readxl` package.  If you alr
 
 Once the library is installed we can use the function `readxl::read_excel()`, which reads data from an excel file.
 
-## **Step 1** - Make sure the data looks OK and is in the right place on your computer
+## Make sure the data looks OK and is in the right place on your computer
 
 Before we dive in and import it, we need to make sure our data is in a sensible place.
 
@@ -217,7 +217,7 @@ range(walkingdat$time, na.rm = TRUE)
 
 Now we have a cleaned dataset in our environment we can proceed with our visualisation and analysis:
 
-# Exercises
+# Analysis - Exercises
 
 Add commands to your script file to answer the following questions.  Add comments (lines beginning with `#` to help you remember what you did and why!).
 
