@@ -271,6 +271,21 @@ We will discuss the testing, modelling and graphing elements in more detail on d
     a. Consider the assumptions for a t-test, and whether they are met in this dataset.  
     a. Do you believe that treatment affects walking speed?
 
+1.  Linear model diagnostics
+    a. Estimate a linear model (with `lm`) to estimate/test the effect of treatment on task completion time.
+    a. Use `summary` to get the model coefficients and p-values
+    a. Use `broom::tidy` to get the model coefficients and p-values
+    a. Compare the model results to the equivalent t-test
+    a. Extend the model to include the effects of age and sex as potential covariates.
+    a. Use `plot()` to explore the model diagnostics
+    a. Use `performance::check_model` to explore the model diagnostics
+    a. Now estimate a new model to compare the task completion speed between groups.
+    a. Get the model coefficients and p-values
+    a. Check the model diagnostics using `plot` or `performance::check_model`
+    a. Why are the result from this model different?  How do you interpret the results?
+    a. Can you get the confidence intervals for the treatment effect (use the help for `broom::tidy`)
+    a. Use `model_summary` package to make a pretty model summary table
+
 
 # Solutions
 
@@ -481,3 +496,72 @@ The Mann-Whitney test (Wilcox test) does not make this assumption, and is more r
 *Do you believe that treatment affects walking speed?*
 
 *Try the t-test or linear model using the speed variable that you created instead of the time variable that is in the dataset.*
+
+
+### Diagnostics
+
+*Estimate a linear model (with `lm`) to estimate/test the effect of treatment on task completion time.*
+
+```{r }
+mod1 <- lm(data=walkingdat , time ~ group)
+```
+
+*Use `summary` to get the model coefficients and p-values*
+*Use `broom::tidy` to get the model coefficients and p-values*
+
+```{r }
+mod1 |> summary()
+mod1 |> broom::tidy()
+```
+
+
+*Compare the model results to the equivalent t-test*
+*Extend the model to include the effects of age and sex as potential covariates.*
+
+```{r }
+mod2 <- lm(data=walkingdat , time ~ group + age + sex)
+```
+
+*Use `plot()` to explore the model diagnostics*
+
+```{r }
+## You could plot model 1 or model 2.
+plot(mod1)
+```
+
+*Use `performance::check_model` to explore the model diagnostics*
+
+```{r }
+performance::check_model(mod1)
+```
+
+*Now estimate a new model to compare the task completion speed between groups.*
+*Get the model coefficients and p-values*
+*Check the model diagnostics using `plot` or `performance::check_model`*
+
+```{r }
+
+walkingdat$speed <- 1/walkingdat$time
+mod3 <- lm(data=walkingdat , speed ~ group + age + sex)
+performance::check_model(mod3)
+
+```
+
+    a. Why are the result from this model different?  How do you interpret the results?
+    a. Can you get the confidence intervals for the treatment effect (use the help for `broom::tidy`)
+    a. Use `model_summary` package to make a pretty model summary table
+
+```{r }
+modelsummary::modelsummary(mod3)
+
+## I didn't do very well!
+modelsummary::modelsummary(mod3 , 
+                           estimate="{estimate} [{conf.low}, {conf.high}] {stars}", 
+                           coef_rename = c('(Intercept)'="Intercept", 
+                                           'grouptreat'="Treatment", 
+                                           'age'="Age (per year)", 
+                                           'sexM'="Male vs Female"), 
+                           statistic=NULL, )
+```
+
+
